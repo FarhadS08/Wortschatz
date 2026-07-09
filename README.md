@@ -7,7 +7,7 @@ A simple, single-file German flashcard app. Open `wortschatz.html` in any browse
 - **Spaced repetition** — Leitner-style boxes (repeat failed cards immediately; known cards come back after 1 / 3 / 7 / 21 days)
 - **Topics** — toggle categories on/off with the chips above the card deck
 - **Unlimited words** — add your own words in the *+ Neu* tab
-- **AI assist** — type just the German word and the AI fills in the article, translation, example sentence and a grammar note (auto article detection with a suffix-rule fallback when offline)
+- **AI assist** — type just the German word and the AI fills in the article, translation, example sentence and a grammar note (auto article detection with a suffix-rule fallback when offline). The AI calls need an environment that proxies `api.anthropic.com` (e.g. running as a claude.ai artifact); opened as a plain local file, the app falls back to the built-in suffix rules
 - **Search & edit** — full word list with search, inline edit and delete
 
 ## Built-in categories

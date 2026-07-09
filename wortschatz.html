@@ -981,7 +981,7 @@ async function aiArticle(word){
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      model:'claude-sonnet-4-6',
+      model:'claude-sonnet-5',
       max_tokens:1000,
       messages:[{role:'user',content:'Welcher Artikel gehört zum deutschen Wort "'+word+'"? Antworte mit genau einem Wort: der, die, das oder kein (falls es kein Nomen ist).'}]
     })
@@ -1024,7 +1024,7 @@ async function aiFill(fromSave){
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({model:'claude-sonnet-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})
     });
     if(!res.ok)throw new Error('api');
     const data=await res.json();
