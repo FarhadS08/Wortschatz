@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wortschatz — Moin, Deutsch!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',-apple-system,'Segoe UI',Roboto,sans-serif;background:#F4F6F5;color:#111111;min-height:100vh}
+.hidden{display:none!important}
+.app{max-width:620px;margin:0 auto;padding:28px 20px 60px}
+
+.top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#0A7A52;margin-bottom:2px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+.stats{text-align:right;font-size:13px;color:#666666;padding-bottom:3px}
+.stats b{color:#111111;font-weight:600}
+
+.tabs{display:flex;background:#E9ECEA;border-radius:14px;padding:4px;gap:4px;margin-bottom:26px}
+.tab{flex:1;border:0;background:transparent;border-radius:10px;height:40px;font:inherit;font-size:14px;font-weight:500;color:#666666;cursor:pointer;transition:all .15s}
+.tab.active{background:#fff;color:#111111;font-weight:600;box-shadow:0 1px 4px rgba(17,17,17,.08)}
+
+.progress{height:5px;background:#E6E9E7;border-radius:99px;margin-bottom:18px;overflow:hidden}
+#study-bar{height:100%;width:0;background:#0A7A52;border-radius:99px;transition:width .3s}
+
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.tchip{border:1.5px solid #E4E7E5;background:#fff;color:#9A9A9A;border-radius:999px;padding:7px 14px 7px 10px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .13s}
+.tchip:hover{border-color:#C9CFCB}
+.tchip .tick{width:16px;height:16px;border-radius:50%;border:1.5px solid #C9CFCB;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.tchip .tc{font-weight:500;font-size:12px;opacity:.7}
+.tchip.on{border-color:#0A7A52;background:#E3F2EB;color:#0A7A52}
+.tchip.on .tick{background:#0A7A52;border-color:#0A7A52}
+
+#stage{perspective:1200px;margin-bottom:16px}
+.card{position:relative;height:340px;cursor:pointer}
+.card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.75,.25,1)}
+.card.flipped .card-inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;border:1px solid #E4E7E5;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 30px;box-shadow:0 10px 30px rgba(17,40,30,.06)}
+.face.back{transform:rotateY(180deg)}
+
+.term{font-size:38px;font-weight:600;text-align:center;letter-spacing:-.01em;word-break:break-word;line-height:1.15}
+.term.long{font-size:29px}
+.term.xlong{font-size:22px;line-height:1.3}
+.term span{font-weight:500}
+.dots{display:flex;gap:6px}
+.face .dots{position:absolute;bottom:20px}
+.dot{width:7px;height:7px;border-radius:50%;background:#E0E4E1}
+.dot.on{background:#0A7A52}
+
+.term-sm{font-size:15px;font-weight:600;color:#666666;margin-bottom:10px}
+.art-der-t{color:#1A3C8A}.art-die-t{color:#C43020}.art-das-t{color:#0A7A52}
+.trans{font-size:27px;font-weight:600;text-align:center;margin-bottom:14px;letter-spacing:-.01em;line-height:1.2}
+.trans.long{font-size:21px;line-height:1.3}
+.ex{font-size:15.5px;font-style:italic;color:#555555;text-align:center;line-height:1.55;max-width:420px}
+.note{margin-top:16px;font-size:12.5px;color:#0A7A52;background:#E3F2EB;padding:6px 13px;border-radius:999px;font-weight:500;text-align:center}
+.counter{text-align:center;font-size:12.5px;color:#9A9A9A;margin-top:12px}
+
+.btn{border:0;font:inherit;font-weight:600;font-size:15.5px;border-radius:15px;height:54px;cursor:pointer;transition:transform .12s,background .15s,border-color .15s}
+.btn:active{transform:scale(.985)}
+.grade{display:flex;gap:12px}
+.grade .btn{flex:1}
+.again{background:#F9E7E4;color:#C43020}
+.again:hover{background:#F5DCD7}
+.knew{background:#0A7A52;color:#fff;padding:0 26px}
+.knew:hover{background:#086A47}
+.ghost{width:100%;background:#fff;border:1px solid #E4E7E5;color:#333333}
+.ghost:hover{border-color:#C9CFCB}
+#study-actions{min-height:54px}
+
+.state{background:#fff;border:1px solid #E4E7E5;border-radius:22px;padding:52px 30px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.state-h{font-size:21px;font-weight:600}
+.state-p{font-size:14.5px;color:#666666;margin-bottom:10px;line-height:1.6}
+.state svg{margin-bottom:4px}
+
+.list-head{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+#search{flex:1;height:46px;border:1px solid #E4E7E5;border-radius:13px;padding:0 16px;font:inherit;font-size:14.5px;background:#fff;outline:none;transition:border .15s,box-shadow .15s}
+#search:focus{border-color:#0A7A52;box-shadow:0 0 0 3px rgba(10,122,82,.12)}
+#count-label{font-size:13px;color:#9A9A9A;white-space:nowrap}
+.row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E4E7E5;border-radius:15px;padding:13px 15px;margin-bottom:9px}
+.gdot{width:9px;height:9px;border-radius:50%;flex:none}
+.g-der{background:#1A3C8A}.g-die{background:#C43020}.g-das{background:#0A7A52}.g-none{background:#C9CFCB}
+.row-main{flex:1;min-width:0;cursor:pointer}
+.row-de{font-weight:600;font-size:15px}
+.row-en{font-size:13px;color:#777777;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-topic{color:#B0B5B1}
+.dots.small .dot{width:5.5px;height:5.5px}
+.icon-btn{border:0;background:transparent;color:#B4B9B5;cursor:pointer;padding:7px;border-radius:9px;display:flex;align-items:center;font:inherit;transition:all .13s}
+.icon-btn:hover{background:#F2F4F3;color:#C43020}
+.icon-btn.armed{background:#F9E7E4;color:#C43020;font-size:12px;font-weight:600;padding:7px 10px}
+.empty-list{text-align:center;color:#9A9A9A;font-size:14px;padding:36px 0}
+
+.form{background:#fff;border:1px solid #E4E7E5;border-radius:22px;padding:26px 24px}
+.form h2{font-size:18px;font-weight:600;margin-bottom:20px}
+.field{margin-bottom:16px}
+label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8A8F8B;margin-bottom:7px}
+.input{width:100%;height:50px;border:1px solid #E4E7E5;border-radius:13px;padding:0 15px;font:inherit;font-size:15px;outline:none;background:#FBFCFB;transition:border .15s,box-shadow .15s}
+.input:focus{border-color:#0A7A52;box-shadow:0 0 0 3px rgba(10,122,82,.12);background:#fff}
+.art-row{display:flex;gap:8px}
+.art-opt{flex:1;height:44px;border:1.5px solid #E4E7E5;background:#fff;border-radius:12px;font:inherit;font-size:14px;font-weight:600;color:#9A9A9A;cursor:pointer;transition:all .13s}
+.art-opt.sel[data-a='']{border-color:#666666;color:#333333;background:#F2F4F3}
+.art-opt.sel[data-a='der']{border-color:#1A3C8A;color:#1A3C8A;background:#E7ECF7}
+.art-opt.sel[data-a='die']{border-color:#C43020;color:#C43020;background:#F9E7E4}
+.art-opt.sel[data-a='das']{border-color:#0A7A52;color:#0A7A52;background:#E3F2EB}
+.art-opt.auto{display:inline-flex;align-items:center;justify-content:center;gap:5px;color:#0A7A52;border-style:dashed;border-color:#BFE0D2}
+.art-opt.auto:hover{background:#E3F2EB;border-color:#0A7A52}
+.art-opt.auto:disabled{opacity:.55;cursor:wait}
+.ai-fill{width:100%;background:#fff;border:1.5px dashed #BFE0D2;color:#0A7A52;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:50px;font-size:14.5px;margin-top:4px}
+.ai-fill:hover{background:#E3F2EB;border-color:#0A7A52}
+.ai-fill:disabled{opacity:.55;cursor:wait}
+.form-actions{display:flex;gap:10px;margin-top:22px}
+#btn-save{flex:1}
+#btn-cancel{padding:0 22px;background:#F2F4F3;color:#555555}
+.hint{font-size:12px;color:#A0A5A1;margin-top:14px;text-align:center}
+.foot{margin-top:26px;text-align:center;font-size:12px;color:#B7BCB8}
+
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);background:#111111;color:#fff;font-size:13.5px;font-weight:500;padding:10px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s;z-index:50}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (prefers-reduced-motion:reduce){.card-inner{transition:none}#study-bar{transition:none}}
+@media (max-width:460px){
+  .term{font-size:31px}
+  .term.long{font-size:25px}
+  .term.xlong{font-size:19px}
+  .trans{font-size:23px}
+  .trans.long{font-size:19px}
+  .card{height:310px}
+  h1{font-size:23px}
+  .app{padding:22px 14px 50px}
+  .art-opt{font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="top">
+    <div>
+      <div class="eyebrow">Moin, Deutsch!</div>
+      <h1>Wortschatz</h1>
+    </div>
+    <div class="stats"><b id="stat-total">0</b> Wörter · <b id="stat-due">0</b> fällig</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-study" onclick="show('study')">Lernen</button>
+    <button class="tab" id="tab-list" onclick="show('list')">Wörter</button>
+    <button class="tab" id="tab-add" onclick="goAdd()">+ Neu</button>
+  </div>
+
+  <section id="view-study">
+    <div class="topics" id="topic-chips"></div>
+    <div class="progress" id="study-progress"><div id="study-bar"></div></div>
+    <div id="stage"></div>
+    <div id="study-actions"></div>
+  </section>
+
+  <section id="view-list" class="hidden">
+    <div class="list-head">
+      <input id="search" placeholder="Suchen …" oninput="renderList()">
+      <span id="count-label"></span>
+    </div>
+    <div id="word-list"></div>
+  </section>
+
+  <section id="view-add" class="hidden">
+    <div class="form">
+      <h2 id="form-title">Neues Wort</h2>
+      <div class="field">
+        <label>Artikel</label>
+        <div class="art-row">
+          <button class="art-opt sel" data-a="" onclick="setArt('',true)">–</button>
+          <button class="art-opt" data-a="der" onclick="setArt('der',true)">der</button>
+          <button class="art-opt" data-a="die" onclick="setArt('die',true)">die</button>
+          <button class="art-opt" data-a="das" onclick="setArt('das',true)">das</button>
+          <button class="art-opt auto" id="btn-auto" title="Artikel automatisch bestimmen" onclick="autoArticle(false)"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8zM19 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>Auto</button>
+        </div>
+      </div>
+      <div class="field"><label>Wort *</label><input id="f-word" class="input" placeholder="Erfindung" onkeydown="enterSave(event)"></div>
+      <div class="field"><label>Übersetzung *</label><input id="f-trans" class="input" placeholder="invention" onkeydown="enterSave(event)"></div>
+      <div class="field"><label>Beispielsatz</label><input id="f-ex" class="input" placeholder="Die Pizza war eine geniale Erfindung." onkeydown="enterSave(event)"></div>
+      <div class="field"><label>Notiz</label><input id="f-note" class="input" placeholder="von: erfinden" onkeydown="enterSave(event)"></div>
+      <div class="field"><label>Thema</label><input id="f-topic" class="input" list="topics-dl" placeholder="Meine Wörter" onkeydown="enterSave(event)"><datalist id="topics-dl"></datalist></div>
+      <button class="btn ai-fill" id="btn-fill" onclick="aiFill(false)"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8zM19 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>Mit KI ausfüllen</button>
+      <div class="form-actions">
+        <button class="btn knew" id="btn-save" onclick="saveWord()">Speichern</button>
+        <button class="btn hidden" id="btn-cancel" onclick="resetForm();show('list')">Abbrechen</button>
+      </div>
+      <div class="hint">Nur das Wort eingeben + Enter → KI füllt Artikel, Übersetzung &amp; Beispiel aus</div>
+    </div>
+  </section>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const KEY='wortschatz-deck-v1';
+const INTERVALS=[0,0,1,3,7,21];
+const TRASH='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>';
+const AUTO_LABEL='<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8zM19 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg>Auto';
+
+let deck={words:[]};
+let queue=[],qi=0,flipped=false,sessionKnew=0,sessionAgain=0;
+let editingId=null,armedDelete=null,armTimer=null,selArt='',currentView='study';
+let artTouched=false,saving=false;
+let storageOK=true;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const store=(window.storage&&typeof window.storage.get==='function')?window.storage:(storageOK=false,{
+  _m:{},
+  async get(k){return (k in this._m)?{key:k,value:this._m[k]}:null;},
+  async set(k,v){this._m[k]=v;return{key:k,value:v};}
+});
+
+function seedWords(){
+  const now=Date.now();
+  const mk=(art,de,en,ex,note,i)=>({id:'w'+(now-i),art,de,en,ex,note,topic:'Meine Wörter',box:1,due:0,created:now-i});
+  return[
+    mk('die','Weise','way, manner','Auf diese Weise lernt man schneller.','auf diese Weise = in this way',1),
+    mk('','zubereiten','to prepare (food)','Ich bereite den Salat zu.','trennbar → ich bereite … zu',2),
+    mk('der','Nachteil','disadvantage','Der einzige Nachteil ist der Preis.','Gegenteil: der Vorteil',3),
+    mk('','danach','afterwards, after that','Zuerst kochen wir, danach essen wir.','',4),
+    mk('die','Erfindung','invention','Die Pizza war eine geniale Erfindung.','von: erfinden (to invent)',5),
+    mk('die','Armen','the poor (people)','Früher war das ein Essen für die Armen.','Plural · von: arm (poor)',6),
+    mk('','enthalten','to contain','Cola enthält viel Zucker.','er/sie/es enthält · nicht trennbar',7),
+    mk('','weltbekannt','world-famous','Döner ist heute weltbekannt.','Achtung: doppel-n',8),
+    mk('','dünn','thin','Die Scheiben sind sehr dünn.','Gegenteil: dick',9)
+  ];
+}
+
+function adjPack(){
+  const now=Date.now();
+  const mk=(de,en,ex,note,i)=>({id:'adj'+i,art:'',de,en,ex,note,topic:'Adjektive',box:1,due:0,created:now});
+  return[
+    mk('groß','big, tall','Hamburg ist eine große Stadt.','Gegenteil: klein',1),
+    mk('klein','small','Wir haben eine kleine Küche.','Gegenteil: groß',2),
+    mk('gut','good','Das ist eine gute Idee.','Gegenteil: schlecht',3),
+    mk('schlecht','bad','Das Wetter ist heute schlecht.','Gegenteil: gut',4),
+    mk('schön','beautiful, nice','Ich wünsche dir einen schönen Tag.','',5),
+    mk('neu','new','Er kauft sich ein neues Handy.','Gegenteil: alt',6),
+    mk('alt','old','Mein Auto ist ziemlich alt.','Gegenteil: neu / jung',7),
+    mk('teuer','expensive','Diese Schuhe sind mir zu teuer.','Gegenteil: billig · dekliniert: teur- (ein teures Auto)',8),
+    mk('billig','cheap','Der Rock war ziemlich billig.','Gegenteil: teuer',9),
+    mk('schnell','fast','Du lernst wirklich schnell.','Gegenteil: langsam',10),
+    mk('langsam','slow','Sprich bitte langsamer!','Gegenteil: schnell',11),
+    mk('einfach','easy, simple','Die Aufgabe ist ganz einfach.','Gegenteil: schwierig',12),
+    mk('schwierig','difficult','Deutsche Artikel sind manchmal schwierig.','Gegenteil: einfach',13),
+    mk('wichtig','important','Das ist ein wichtiger Termin.','',14),
+    mk('müde','tired','Nach der Arbeit bin ich müde.','',15),
+    mk('lecker','tasty','Der Döner hier ist richtig lecker.','',16)
+  ];
+}
+
+function prepPack(){
+  const now=Date.now();
+  const mk=(de,en,ex,note,i)=>({id:'prep'+i,art:'',de,en,ex,note,topic:'Präpositionen',box:1,due:0,created:now});
+  return[
+    mk('mit','with','Ich fahre mit dem Bus.','immer + Dativ',1),
+    mk('für','for','Das Geschenk ist für dich.','immer + Akkusativ',2),
+    mk('ohne','without','Ich trinke Kaffee ohne Zucker.','immer + Akkusativ',3),
+    mk('bei','at, with (someone)','Sie wohnt bei ihren Eltern.','immer + Dativ',4),
+    mk('nach','after; to (cities)','Nach dem Essen gehen wir spazieren.','immer + Dativ',5),
+    mk('von','from, of','Das ist ein Geschenk von meiner Oma.','immer + Dativ',6),
+    mk('zu','to (people, places)','Ich gehe heute zu meiner Schwester.','immer + Dativ',7),
+    mk('aus','from, out of','Er kommt aus der Türkei.','immer + Dativ',8),
+    mk('in','in, into','Ich bin in der Küche.','Wechsel: wo? + Dativ · wohin? + Akkusativ',9),
+    mk('auf','on, onto','Der Vogel sitzt auf dem Baum.','Wechsel: wo? + Dativ · wohin? + Akkusativ',10),
+    mk('an','at, on (vertical)','Das Bild hängt an der Wand.','Wechsel: wo? + Dativ · wohin? + Akkusativ',11),
+    mk('über','about; above','Wir sprechen über den Film.','über + Thema: + Akkusativ',12),
+    mk('seit','since, for (time)','Ich lerne seit einem Jahr Deutsch.','immer + Dativ',13),
+    mk('gegen','against','Wir spielen gegen euch.','immer + Akkusativ',14)
+  ];
+}
+
+function floskelnPack(){
+  const now=Date.now();
+  const mk=(de,en,note,i)=>({id:'phr'+i,art:'',de,en,ex:'',note,topic:'Sätze & Floskeln',box:1,due:0,created:now});
+  return[
+    // Kapitel 01 — Grüßen & Verabschieden
+    mk('Moin!','hi / hello — any time of day','Norddeutsch · the northern universal',1),
+    mk('Moin Moin!','hi there!','Norddeutsch · doubling it is already chatty',2),
+    mk('Hallo!','hello','',3),
+    mk('Guten Morgen! / Morgen!','good morning / morning','',4),
+    mk('Guten Tag!','good day, hello','formal — strangers, officials',5),
+    mk('Guten Abend!','good evening','',6),
+    mk('Grüß dich!','hi! (someone you know)','informal',7),
+    mk('Na?','hey — how are you — what’s up','a whole greeting in one word',8),
+    mk('Wie geht’s dir?','how are you? (informal)','formal: Wie geht es Ihnen?',9),
+    mk('Und selbst? / Und dir?','and you?','',10),
+    mk('Schön, dich zu sehen!','good to see you!','',11),
+    mk('Lange nicht gesehen!','long time no see!','',12),
+    mk('Tschüss! / Tschüssi!','bye!','',13),
+    mk('Bis dann! / Bis später!','see you then / later','',14),
+    mk('Bis bald!','see you soon','',15),
+    mk('Bis morgen!','see you tomorrow','',16),
+    mk('Wir sehen uns!','see you around','',17),
+    mk('Auf Wiedersehen!','goodbye','formal — in person',18),
+    mk('Auf Wiederhören!','goodbye','on the phone only!',19),
+    mk('Schönen Tag noch!','have a nice day!','hören · the classic shop goodbye',20),
+    mk('Schönes Wochenende!','have a good weekend!','',21),
+    mk('Mach’s gut! — Mach du auch!','take care! — you too!','',22),
+    mk('Komm gut nach Hause!','get home safe!','',23),
+    // Kapitel 02 — Höflichkeit
+    mk('Bitte.','please · here you go · you’re welcome','one word, three jobs',24),
+    mk('Bitte schön!','here you are / you’re welcome','hören · when handing something over',25),
+    mk('Danke schön! / Vielen Dank!','thank you very much!','',26),
+    mk('Tausend Dank!','thanks a million!','sagen',27),
+    mk('Gern geschehen. / Gerne!','you’re welcome / my pleasure','hören',28),
+    mk('Kein Problem. / Kein Ding.','no problem','Kein Ding = casual',29),
+    mk('Nichts zu danken.','don’t mention it','',30),
+    mk('Da nich für!','you’re welcome!','hören · Norddeutsch · the northern answer to thanks',31),
+    mk('Entschuldigung!','excuse me / sorry','gets attention AND apologizes',32),
+    mk('’Tschuldigung!','sorry!','the casual short form',33),
+    mk('Es tut mir leid.','I am sorry','sagen',34),
+    mk('Das tut mir wirklich leid.','I am really sorry','sagen',35),
+    mk('Macht nichts.','never mind / it’s fine','the answer to an apology',36),
+    mk('Schon gut.','it’s okay / forget it','',37),
+    mk('Passt schon.','it’s fine / no worries','extremely common',38),
+    mk('Kein Stress.','no stress / take it easy','',39),
+    mk('Halb so wild.','not a big deal','',40),
+    mk('Nach Ihnen.','after you','at doors',41),
+    mk('Gesundheit!','bless you!','after a sneeze',42),
+    mk('Guten Appetit!','enjoy your meal!','',43),
+    mk('Danke, gleichfalls!','thanks, you too!','the standard reply',44),
+    // Kapitel 03 — Reaktionen & Rückmeldung
+    mk('Mhm. / Hm.','uh-huh (I’m listening)','16% of all turns are these!',45),
+    mk('Genau.','exactly / right','agreement + “go on”',46),
+    mk('Stimmt.','true / that’s right','',47),
+    mk('Stimmt genau.','exactly right','',48),
+    mk('Ach so!','oh, I see!','the sound of understanding',49),
+    mk('Aha. / Ah, okay.','ah, okay','',50),
+    mk('Echt? / Echt jetzt?','really? / for real?','',51),
+    mk('Wirklich?','really?','',52),
+    mk('Im Ernst?','seriously?','',53),
+    mk('Krass!','wow / intense!','casual, young',54),
+    mk('Wahnsinn!','crazy / amazing!','',55),
+    mk('Oh nein! / Oh Mann!','oh no! / oh man!','',56),
+    mk('Ach was!','no way! / come off it!','',57),
+    mk('Alles klar.','got it / all good','works as question AND answer',58),
+    mk('Verstehe.','I see / understood','',59),
+    mk('Na klar! / Aber klar!','of course!','',60),
+    mk('Logisch!','obviously! / sure!','',61),
+    mk('Eben!','precisely! / my point exactly','',62),
+    mk('Was?!','what?!','surprise',63),
+    mk('Oh je!','oh dear!','',64),
+    mk('Schade.','that’s a pity','',65),
+    mk('Wie schön!','how lovely!','',66),
+    mk('Super! / Klasse! / Prima!','great! / awesome!','',67),
+    mk('Quatsch!','nonsense!','',68),
+    mk('Siehste!','see! / told you!','from “siehst du”',69),
+    // Kapitel 04 — Zustimmen & Widersprechen
+    mk('Da hast du recht.','you’re right there','formal: Da haben Sie recht',70),
+    mk('Das sehe ich auch so.','I see it that way too','',71),
+    mk('Da stimme ich dir zu.','I agree with you','',72),
+    mk('Ganz meine Meinung.','exactly my opinion','',73),
+    mk('Bin ich voll bei dir.','totally with you','casual',74),
+    mk('Stimmt, aber …','true, but …','',75),
+    mk('Einerseits …, andererseits …','on one hand …, on the other …','',76),
+    mk('Das sehe ich anders.','I see it differently','the polite disagreement',77),
+    mk('Da muss ich widersprechen.','I have to disagree','',78),
+    mk('Das finde ich nicht.','I don’t think so','',79),
+    mk('Ich bin anderer Meinung.','I’m of a different opinion','',80),
+    mk('Naja, ich weiß nicht …','well, I’m not sure …','soft disagreement',81),
+    mk('Kommt drauf an.','depends.','',82),
+    mk('Jein.','yes and no','ja + nein in one word',83),
+    mk('Auf jeden Fall!','definitely!','',84),
+    mk('Auf keinen Fall!','no way!','',85),
+    // Kapitel 05 — Smalltalk
+    mk('Na, alles gut?','hey, all good?','the everyday opener',86),
+    mk('Wie läuft’s?','how’s it going?','',87),
+    mk('Was machst du so?','what are you up to these days?','',88),
+    mk('Alles gut bei dir?','everything okay with you?','',89),
+    mk('Gut, danke. Und dir?','good, thanks. And you?','sagen',90),
+    mk('Muss ja.','can’t complain / gotta keep going','hören · the famously dry answer',91),
+    mk('Es geht. / Ganz okay.','so-so / okay-ish','',92),
+    mk('Kann nicht klagen.','can’t complain','',93),
+    mk('Alles beim Alten.','same as ever','',94),
+    mk('Was gibt’s Neues?','what’s new?','',95),
+    mk('Nicht viel. Und bei dir?','not much. You?','sagen',96),
+    mk('Schönes Wetter heute, oder?','nice weather today, right?','weather = the safe opener',97),
+    mk('So ein Mistwetter!','what awful weather!','Norddeutsch · a northern classic',98),
+    mk('Ganz schön kalt heute!','pretty cold today!','',99),
+    mk('Na, auch hier?','oh, you here too?','',100),
+    mk('Wie war dein Wochenende?','how was your weekend?','',101),
+    mk('Schönen Feierabend!','have a good after-work evening!','untranslatable & beloved',102),
+    mk('Mahlzeit!','hello! (around lunchtime)','hören · office corridors at noon',103),
+    // Kapitel 06 — Satzanfänge
+    mk('Ich hätte gern …','I would like …','sagen · THE polite request frame',104),
+    mk('Ich möchte gern …','I would like …','sagen',105),
+    mk('Könnten Sie bitte …?','could you please …?','sagen',106),
+    mk('Kann ich …? / Darf ich …?','can I …? / may I …?','sagen',107),
+    mk('Würden Sie bitte …?','would you please …?','sagen · very polite',108),
+    mk('Es tut mir leid, aber …','I’m sorry, but …','the soft no',109),
+    mk('Ich glaube schon.','I think so','',110),
+    mk('Ich glaube nicht.','I don’t think so','',111),
+    mk('Ich bin mir nicht sicher, aber …','I’m not sure, but …','',112),
+    mk('Ich bin gerade dabei, …','I’m in the middle of …','',113),
+    mk('Ich wollte gerade …','I was just about to …','',114),
+    mk('Das heißt, …','that means … / in other words …','',115),
+    mk('Es kommt darauf an.','it depends','',116),
+    mk('Ich habe gehört, dass …','I’ve heard that …','',117),
+    mk('Ich finde, dass …','I think that …','',118),
+    mk('Meiner Meinung nach …','in my opinion …','',119),
+    mk('Wenn ich ehrlich bin, …','to be honest …','',120),
+    mk('Von mir aus.','fine by me / I don’t mind','',121),
+    mk('Wie gesagt, …','as I said …','',122),
+    mk('Keine Ahnung.','no idea','heard constantly',123),
+    mk('Mal sehen. / Mal schauen.','we’ll see','often a soft no',124),
+    mk('Ich meld mich.','I’ll be in touch','',125),
+    mk('Gib mir Bescheid!','let me know!','',126),
+    // Kapitel 07 — Füllwörter & Zeitgewinnen
+    mk('Ähm … / Äh …','um … / uh …','the universal stall',127),
+    mk('Also …','so … / well …','starts half of all answers',128),
+    mk('Tja …','well … (what can you do)','',129),
+    mk('Naja …','well …','',130),
+    mk('Wie soll ich sagen …','how shall I put it …','',131),
+    mk('Moment mal!','wait a sec!','',132),
+    mk('Warte mal!','hold on!','',133),
+    mk('Lass mich überlegen.','let me think','',134),
+    mk('Sagen wir mal …','let’s say …','',135),
+    mk('Ich sag mal …','I’d say … / sort of','the classic spoken hedge',136),
+    mk('Wie heißt das nochmal?','what’s it called again?','',137),
+    mk('Wo war ich?','where was I?','',138),
+    mk('… ne? / … oder?','… right? / … isn’t it?','Norddeutsch · northern tag: “nech?”',139),
+    mk('weißt du?','you know?','',140),
+    mk('ich mein …','I mean …','',141),
+    mk('sozusagen','so to speak','',142),
+    // Kapitel 08 — Ausrufe
+    mk('Ach komm!','oh come on!','',143),
+    mk('Na endlich!','finally!','',144),
+    mk('Na so was!','well, would you believe it!','',145),
+    mk('Mein Gott! / Oh Gott!','my God!','',146),
+    mk('Um Gottes willen!','for God’s sake!','',147),
+    mk('So ein Mist!','damn it!','mild & extremely common',148),
+    mk('Verdammt!','damn!','',149),
+    mk('Was soll’s.','whatever / oh well','',150),
+    mk('Das gibt’s doch nicht!','that can’t be true!','',151),
+    mk('Nicht zu fassen!','unbelievable!','',152),
+    mk('Zum Glück!','thank goodness!','',153),
+    mk('Gott sei Dank!','thank God!','',154),
+    mk('Puh!','phew!','',155),
+    mk('Na also!','there you go!','',156),
+    mk('Das wär’s!','that’s it! / that’ll be all','',157),
+    mk('Alles Gute!','all the best!','',158),
+    mk('Viel Glück!','good luck!','',159),
+    mk('Viel Erfolg!','good luck! (for a task)','exams, interviews, projects',160),
+    mk('Toi, toi, toi!','fingers crossed!','',161),
+    // Kapitel 09 — Hilfe & Nachfragen
+    mk('Wie bitte?','sorry, what? / pardon?','sagen · the polite “huh?”',162),
+    mk('Können Sie das bitte wiederholen?','could you repeat that, please?','sagen',163),
+    mk('Können Sie bitte langsamer sprechen?','could you speak more slowly?','sagen',164),
+    mk('Ich habe das nicht verstanden.','I didn’t understand that','sagen',165),
+    mk('Ich verstehe nur Bahnhof.','it’s all Greek to me','lit.: “I only understand train station”',166),
+    mk('Was bedeutet …?','what does … mean?','sagen',167),
+    mk('Wie sagt man … auf Deutsch?','how do you say … in German?','sagen',168),
+    mk('Können Sie das aufschreiben?','can you write that down?','sagen',169),
+    mk('Können Sie das buchstabieren?','can you spell that?','',170),
+    mk('Sprechen Sie Englisch?','do you speak English?','sagen',171),
+    mk('Ich spreche nur ein bisschen Deutsch.','I only speak a little German','sagen',172),
+    mk('Ich bin neu hier.','I’m new here','sagen',173),
+    mk('Können Sie mir helfen?','can you help me?','sagen',174),
+    mk('Wie meinen Sie das?','what do you mean by that?','sagen',175),
+    mk('Meinen Sie …?','do you mean …?','sagen',176),
+    mk('Moment, ich überlege.','one moment, let me think','sagen',177),
+    // Kapitel 10 — Pläne machen
+    mk('Hast du Lust auf …?','do you feel like …?','',178),
+    mk('Hast du heute Abend was vor?','do you have plans tonight?','',179),
+    mk('Wollen wir …?','shall we …?','“Wollen wir einen Kaffee trinken?”',180),
+    mk('Sollen wir …?','should we …?','',181),
+    mk('Lass uns …!','let’s …!','“Lass uns gehen!”',182),
+    mk('Wie wär’s mit …?','how about …?','',183),
+    mk('Was hältst du davon?','what do you think of that?','',184),
+    mk('Komm doch mit!','come along!','',185),
+    mk('Bist du dabei?','are you in?','',186),
+    mk('Passt dir das?','does that suit you?','',187),
+    mk('Geht das bei dir?','does that work for you?','',188),
+    mk('Wann hast du Zeit?','when are you free?','',189),
+    mk('Sagen wir um acht?','let’s say at eight?','',190),
+    mk('Abgemacht!','deal!','',191),
+    mk('Machen wir!','let’s do it!','',192),
+    mk('Klingt gut!','sounds good!','',193),
+    mk('Gerne! / Sehr gerne!','gladly! / I’d love to!','',194),
+    mk('Ich kann leider nicht.','sorry, I can’t','sagen',195),
+    mk('Ich hab schon was vor.','I already have plans','sagen',196),
+    mk('Vielleicht ein andermal.','maybe another time','sagen',197),
+    mk('Ich schaff’s nicht.','I can’t make it','sagen',198),
+    mk('Bis gleich!','see you in a bit!','',199),
+    // Kapitel 11 — Beim Bäcker
+    mk('Der Nächste, bitte!','next, please!','hören · your cue at the counter',200),
+    mk('Was darf’s sein?','what would you like?','hören · the baker’s opener',201),
+    mk('Sie wünschen?','what can I get you?','hören',202),
+    mk('Bitte schön?','yes please? (your turn)','hören',203),
+    mk('Ich hätte gern zwei Brötchen.','I’d like two bread rolls','sagen',204),
+    mk('Ich krieg ein Mischbrot.','I’ll get a mixed loaf','sagen · casual: “ich krieg / ich nehm”',205),
+    mk('Einmal das, bitte.','one of those, please','sagen · pointing works!',206),
+    mk('Geschnitten?','sliced?','hören',207),
+    mk('Ja, bitte. / Nein, am Stück.','yes, please / no, whole','sagen',208),
+    mk('Zum Hieressen oder zum Mitnehmen?','eat in or take away?','hören',209),
+    mk('Zum Mitnehmen, bitte.','to take away, please','sagen',210),
+    mk('Sonst noch was?','anything else?','hören · also: “Darf’s sonst noch was sein?”',211),
+    mk('Nein danke, das war’s.','no thanks, that’s all','sagen',212),
+    mk('Das macht 3,10 Euro.','that comes to €3.10','hören',213),
+    mk('Haben Sie’s passend?','do you have exact change?','hören',214),
+    mk('Ich hab’s passend.','I have it exact','sagen',215),
+    // Kapitel 12 — An der Kasse
+    mk('Sammeln Sie Punkte?','do you collect points?','hören · loyalty card question #1',216),
+    mk('Haben Sie eine Payback-Karte?','do you have a Payback card?','hören',217),
+    mk('Nein, danke.','no, thanks','sagen · the simple answer',218),
+    mk('Brauchen Sie eine Tüte?','do you need a bag?','hören',219),
+    mk('Ja, eine Tüte, bitte.','yes, a bag please','sagen',220),
+    mk('Zusammen oder getrennt?','together or separately?','hören · paying with someone',221),
+    mk('Bar oder mit Karte?','cash or card?','hören',222),
+    mk('Mit Karte, bitte.','by card, please','sagen',223),
+    mk('Karte oder Handy?','card or phone?','hören',224),
+    mk('Bitte die Karte.','card please (tap/insert)','hören',225),
+    mk('Bitte die PIN eingeben.','please enter your PIN','hören',226),
+    mk('Hat leider nicht geklappt.','it didn’t work, sorry','hören · card declined — try again',227),
+    mk('Brauchen Sie den Bon?','do you need the receipt?','hören',228),
+    mk('Nein danke, brauch ich nicht.','no thanks, I don’t need it','sagen',229),
+    mk('Haben Sie’s klein?','do you have smaller change?','hören',230),
+    mk('Möchten Sie aufrunden?','would you like to round up?','hören · donation question',231),
+    mk('Das wären dann 27,40.','that’ll be 27.40','hören',232),
+    mk('Und 1,10 zurück.','and €1.10 back','hören · your change',233),
+    mk('Stimmt so!','keep the change!','sagen · tip ≈ round up 5–10%',234),
+    mk('Können Sie schon mal aufs Band legen.','you can put it on the belt','hören',235),
+    // Kapitel 13 — Im Restaurant & Café
+    mk('Haben Sie reserviert?','do you have a reservation?','hören',236),
+    mk('Ein Tisch für zwei, bitte.','a table for two, please','sagen',237),
+    mk('Ist hier noch frei?','is this seat free?','sagen',238),
+    mk('Nehmen Sie Platz!','have a seat!','hören',239),
+    mk('Was möchten Sie trinken?','what would you like to drink?','hören · drinks come first',240),
+    mk('Haben Sie schon gewählt?','have you decided?','hören',241),
+    mk('Was können Sie empfehlen?','what do you recommend?','sagen',242),
+    mk('Ich nehme das Schnitzel.','I’ll have the schnitzel','sagen',243),
+    mk('Für mich bitte …','for me, please …','sagen',244),
+    mk('Und für Sie?','and for you?','hören',245),
+    mk('Möchten Sie eine Vorspeise?','would you like a starter?','hören',246),
+    mk('Hat’s geschmeckt?','did it taste good?','hören · always asked at the end',247),
+    mk('Sehr gut, danke!','very good, thanks!','sagen',248),
+    mk('Hat alles gepasst?','was everything alright?','hören',249),
+    mk('Darf’s noch etwas sein?','anything more?','hören',250),
+    mk('Noch ein Bier, bitte.','another beer, please','sagen',251),
+    mk('Dasselbe nochmal, bitte.','same again, please','sagen',252),
+    mk('Die Rechnung, bitte!','the bill, please!','sagen · also: “Zahlen, bitte!”',253),
+    mk('Getrennt, bitte.','separately, please','sagen',254),
+    mk('Auf die Hand, bitte.','to go, please','sagen · at the counter / Imbiss',255),
+    mk('Selbstbedienung','self-service','hören · a sign you’ll see in cafés',256),
+    // Kapitel 14 — In Bahn & Bus
+    mk('Sehr geehrte Fahrgäste, …','dear passengers, …','hören · announcement opener',257),
+    mk('Meine Damen und Herren, …','ladies and gentlemen, …','hören',258),
+    mk('Nächster Halt: …','next stop: …','hören',259),
+    mk('Nächste Station: …','next station: …','hören · Norddeutsch · Hamburg S-Bahn wording',260),
+    mk('Ausstieg in Fahrtrichtung links.','exit on the left','hören · “in direction of travel”',261),
+    mk('Ausstieg rechts.','exit on the right','hören',262),
+    mk('Zurückbleiben, bitte!','stand back, please!','hören · iconic platform call',263),
+    mk('Bitte einsteigen!','all aboard!','hören',264),
+    mk('Vorsicht bei der Abfahrt!','caution — departing!','hören',265),
+    mk('Bitte beachten Sie die Lücke.','mind the gap','hören · “zwischen Zug und Bahnsteig”',266),
+    mk('Wir erreichen in Kürze …','we will shortly reach …','hören',267),
+    mk('Bitte alle aussteigen!','everybody off, please!','hören · “der Zug endet hier”',268),
+    mk('Der Zug hat leider Verspätung.','the train is delayed','hören · you WILL hear this',269),
+    mk('… wegen einer Störung im Betriebsablauf','… due to an operational disruption','hören · the famous excuse',270),
+    mk('Wir bitten um Ihr Verständnis.','we ask for your understanding','hören · the standard apology',271),
+    mk('Ihre Anschlüsse: …','your connections: …','hören',272),
+    mk('Die Fahrkarten, bitte!','tickets, please!','hören · the conductor',273),
+    mk('Noch jemand zugestiegen?','anyone just boarded?','hören · conductor checking tickets',274),
+    mk('Wo muss ich umsteigen?','where do I change?','sagen',275),
+    mk('Fährt der zum Hauptbahnhof?','does this go to the main station?','sagen',276),
+    mk('Einmal nach Hamburg, bitte.','one ticket to Hamburg, please','sagen',277),
+    // Kapitel 15 — Einkaufen & Wegbeschreibung
+    mk('Kann ich Ihnen helfen?','can I help you?','hören',278),
+    mk('Kommen Sie zurecht?','are you finding everything?','hören',279),
+    mk('Ich schaue nur, danke.','I’m just looking, thanks','sagen · the magic browsing phrase',280),
+    mk('Haben Sie das in einer anderen Größe?','do you have this in another size?','sagen',281),
+    mk('Kann ich das anprobieren?','can I try this on?','sagen',282),
+    mk('Das passt nicht.','it doesn’t fit','sagen',283),
+    mk('Das steht dir gut!','that suits you!','hören',284),
+    mk('Wo finde ich …?','where do I find …?','sagen',285),
+    mk('Ich möchte das umtauschen.','I’d like to exchange this','sagen',286),
+    mk('Haben Sie den Kassenbon?','do you have the receipt?','hören',287),
+    mk('Ist das im Angebot?','is this on offer?','sagen',288),
+    mk('Wie komme ich zum Bahnhof?','how do I get to the station?','sagen',289),
+    mk('Wo ist die nächste Haltestelle?','where’s the nearest stop?','sagen',290),
+    mk('Geradeaus, dann links.','straight ahead, then left','hören',291),
+    mk('An der Ampel rechts.','right at the lights','hören',292),
+    mk('Das ist gleich um die Ecke.','it’s just around the corner','hören',293),
+    mk('Da müssen Sie zurück.','you have to go back','hören',294),
+    mk('Ich bin auch nicht von hier.','I’m not from here either','happens more than you’d think',295),
+    // Kapitel 16 — Zahlen im Alltag
+    mk('Viertel nach drei','quarter past three (3:15)','',296),
+    mk('Viertel vor vier','quarter to four (3:45)','',297),
+    mk('halb acht','7:30 — half TO eight!','the famous trap',298),
+    mk('Punkt acht','eight sharp','',299),
+    mk('neunzehn Uhr dreißig','7:30 pm, official style','hören · announcements & TV',300),
+    mk('kurz nach neun','shortly after nine','',301),
+    mk('gegen zehn','around ten','',302),
+    mk('zwei Euro fünfzig','€2.50','hören · comma, not point!',303),
+    mk('neunundneunzig Cent','99 cents','hören',304),
+    mk('der dritte Zehnte','October 3rd (3.10.)','dates: day comes first',305),
+    mk('ein halbes Kilo','half a kilo','sagen · market talk',306),
+    mk('ein bis zwei','one or two','',307),
+    // Kapitel 17 — Beim Arzt & in der Apotheke
+    mk('Haben Sie einen Termin?','do you have an appointment?','hören · reception question #1',308),
+    mk('Waren Sie schon mal bei uns?','have you been here before?','hören',309),
+    mk('Ihre Versichertenkarte, bitte.','your insurance card, please','hören · the Gesundheitskarte',310),
+    mk('Haben Sie eine Überweisung?','do you have a referral?','hören',311),
+    mk('Nehmen Sie bitte im Wartezimmer Platz.','please take a seat in the waiting room','hören',312),
+    mk('Sie werden aufgerufen.','you’ll be called','hören',313),
+    mk('Der Arzt ist gleich bei Ihnen.','the doctor will be right with you','hören',314),
+    mk('Was führt Sie zu uns?','what brings you in?','hören',315),
+    mk('Wo tut es weh?','where does it hurt?','hören',316),
+    mk('Seit wann haben Sie die Beschwerden?','since when have you had the symptoms?','hören',317),
+    mk('Nehmen Sie Medikamente?','are you taking any medication?','hören',318),
+    mk('Ich habe Schmerzen hier.','I have pain here','sagen · point — it works',319),
+    mk('Mir ist schlecht.','I feel sick / nauseous','sagen',320),
+    mk('Ich habe Fieber und Husten.','I have a fever and a cough','sagen',321),
+    mk('Ich fühle mich nicht gut.','I don’t feel well','sagen',322),
+    mk('Ich brauche eine Krankschreibung.','I need a sick note','sagen · for your employer',323),
+    mk('Atmen Sie tief ein … und aus.','breathe in deeply … and out','hören',324),
+    mk('Ich verschreibe Ihnen etwas.','I’ll prescribe you something','hören',325),
+    mk('Dreimal täglich, nach dem Essen.','three times a day, after meals','hören · pharmacy instructions',326),
+    mk('Gute Besserung!','get well soon!','hören',327),
+    mk('Haben Sie ein Rezept?','do you have a prescription?','hören · at the pharmacy',328),
+    mk('Haben Sie etwas gegen Kopfschmerzen?','do you have something for a headache?','sagen',329),
+    mk('Soll ich es bestellen?','shall I order it (for you)?','hören · when it’s not in stock',330),
+    // Kapitel 18 — Auf dem Amt
+    mk('Nehmen Sie bitte eine Wartenummer.','please take a queue number','hören',331),
+    mk('Bitte warten Sie, bis Ihre Nummer aufgerufen wird.','please wait until your number is called','hören',332),
+    mk('Nummer A47 zu Schalter 3.','number A47 to counter 3','hören · watch the display',333),
+    mk('Worum geht es?','what is it about?','hören',334),
+    mk('Ich möchte mich anmelden.','I’d like to register (my address)','sagen · the Anmeldung',335),
+    mk('Ich möchte einen Termin vereinbaren.','I’d like to make an appointment','sagen',336),
+    mk('Ich brauche eine Meldebescheinigung.','I need a registration certificate','sagen',337),
+    mk('Haben Sie alle Unterlagen dabei?','do you have all your documents?','hören',338),
+    mk('Ihren Ausweis, bitte.','your ID, please','hören · or: Reisepass',339),
+    mk('Bitte füllen Sie das Formular aus.','please fill in the form','hören',340),
+    mk('Bitte hier unterschreiben.','please sign here','hören',341),
+    mk('Da fehlt noch ein Dokument.','a document is still missing','hören',342),
+    mk('Dafür sind wir nicht zuständig.','we’re not responsible for that','hören · the legendary Amt phrase',343),
+    mk('Da müssen Sie ins Zimmer 12.','you need to go to room 12','hören',344),
+    mk('Das dauert etwa zwei Wochen.','that takes about two weeks','hören',345),
+    mk('Sie bekommen Post von uns.','you’ll get mail from us','hören',346),
+    mk('Das kostet zwölf Euro.','that costs twelve euros','hören',347),
+    mk('Bitte zahlen Sie an der Kasse.','please pay at the cashier','hören',348),
+    mk('Das habe ich nicht verstanden.','I didn’t understand that','sagen · always okay to say',349),
+    // Kapitel 19 — Am Telefon
+    mk('Müller.','“Müller.” (surname only)','hören · Germans answer with their name',350),
+    mk('Ja, bitte?','hello? (answering)','hören',351),
+    mk('Hier ist Farhad.','this is Farhad','sagen · or: … am Apparat',352),
+    mk('Guten Tag, mein Name ist …','hello, my name is …','sagen · formal calls',353),
+    mk('Mit wem spreche ich, bitte?','who am I speaking to?','hören',354),
+    mk('Könnte ich bitte Frau Schmidt sprechen?','could I speak to Ms Schmidt?','sagen',355),
+    mk('Worum geht es denn?','what’s it regarding?','hören',356),
+    mk('Ich rufe wegen … an.','I’m calling about …','sagen',357),
+    mk('Einen Moment, bitte.','one moment, please','hören',358),
+    mk('Bleiben Sie dran!','hold the line!','hören',359),
+    mk('Ich verbinde Sie.','I’ll put you through','hören',360),
+    mk('Sie ist gerade nicht da.','she’s not here right now','hören',361),
+    mk('Kann ich etwas ausrichten?','can I take a message?','hören',362),
+    mk('Kann er mich zurückrufen?','can he call me back?','sagen',363),
+    mk('Sie sind falsch verbunden.','you’ve got the wrong number','hören',364),
+    mk('Ich verstehe Sie schlecht.','I can hear you badly','bad connection',365),
+    mk('Bitte hinterlassen Sie eine Nachricht.','please leave a message','hören · the voicemail formula',366),
+    mk('Ich rufe später nochmal an.','I’ll call again later','sagen',367),
+    mk('Danke für den Anruf!','thanks for calling!','hören',368),
+    // Kapitel 20 — Auf der Arbeit
+    mk('Na, alles fit?','morning — all good?','hören · Norddeutsch · northern workplace opener',369),
+    mk('Hast du kurz Zeit?','got a sec?','',370),
+    mk('Hast du mal ’ne Minute?','got a minute?','',371),
+    mk('Können wir kurz sprechen?','can we have a quick word?','',372),
+    mk('Ich bin gerade in einer Besprechung.','I’m in a meeting right now','',373),
+    mk('Ich kümmere mich darum.','I’ll take care of it','',374),
+    mk('Ich geb dir Bescheid.','I’ll let you know','',375),
+    mk('Dafür bin ich nicht zuständig.','that’s not my area','',376),
+    mk('Können wir das verschieben?','can we postpone it?','',377),
+    mk('Passt das so?','is that okay like this?','',378),
+    mk('Geht klar!','will do! / no problem!','',379),
+    mk('Wird gemacht!','consider it done!','',380),
+    // Kapitel 21 — Wohnung & Vermieter
+    mk('Ich interessiere mich für die Wohnung.','I’m interested in the flat','sagen · your opening line',381),
+    mk('Ist die Wohnung noch frei?','is the flat still available?','sagen',382),
+    mk('Wie hoch ist die Miete?','how much is the rent?','sagen',383),
+    mk('Kalt oder warm?','cold or warm (rent)?','warm = utilities included',384),
+    mk('Wie hoch ist die Kaution?','how much is the deposit?','sagen · usually 2–3 cold rents',385),
+    mk('Sind die Nebenkosten inklusive?','are utilities included?','sagen',386),
+    mk('Wann kann ich einziehen?','when can I move in?','sagen',387),
+    mk('Können wir einen Besichtigungstermin machen?','can we arrange a viewing?','sagen',388),
+    mk('Die Heizung funktioniert nicht.','the heating doesn’t work','sagen',389),
+    mk('Da ist Schimmel.','there’s mould','sagen · a serious word — use it',390),
+    mk('Können Sie das reparieren lassen?','can you have it repaired?','sagen',391),
+    mk('Ab 22 Uhr ist Nachtruhe.','quiet hours start at 10 pm','hören · Germans mean it',392),
+    // Kapitel 22 — Glückwünsche & Anlässe
+    mk('Herzlichen Glückwunsch!','congratulations!','all-purpose',393),
+    mk('Alles Gute zum Geburtstag!','happy birthday!','',394),
+    mk('Herzlichen Glückwunsch zur Hochzeit!','congratulations on your wedding!','',395),
+    mk('Alles Liebe!','all the best / much love!','',396),
+    mk('Gute Reise!','have a good trip!','',397),
+    mk('Komm gut an!','arrive safely!','',398),
+    mk('Viel Spaß!','have fun!','',399),
+    mk('Frohe Weihnachten!','merry Christmas!','',400),
+    mk('Guten Rutsch!','happy New Year! (before midnight)','lit. “good slide” into the year',401),
+    mk('Frohes neues Jahr!','happy New Year! (after midnight)','',402),
+    mk('Frohe Ostern!','happy Easter!','',403),
+    mk('Schöne Feiertage!','happy holidays!','',404),
+    mk('Herzliches Beileid.','my condolences','sagen',405),
+    mk('Ich wünsche dir viel Kraft.','I wish you strength','sagen · condolence',406),
+    mk('Prost! / Zum Wohl!','cheers!','eye contact is mandatory!',407),
+    mk('Lass es dir schmecken!','enjoy your food!','',408),
+    mk('Schönen Urlaub!','enjoy your holiday!','',409),
+    // Kapitel 23 — Norddeutsch
+    mk('schnacken','to chat','Norddeutsch · “Lass uns mal schnacken!”',410),
+    mk('Klönschnack','a good long cozy chat','Norddeutsch',411),
+    mk('Jo. / Joa.','yeah','Norddeutsch · the northern yes',412),
+    mk('Dat / wat','that / what','hören · Norddeutsch · northern das / was',413),
+    mk('Digga!','mate! / bro!','hören · Norddeutsch · Hamburg youth address',414),
+    mk('Dat löppt.','it’s going fine / it works','hören · Norddeutsch',415),
+    mk('Nu aber!','come on now!','hören · Norddeutsch',416),
+    mk('Schietwetter','lousy weather','Norddeutsch · you will need this word',417),
+    mk('Tüddelkram','odds and ends, fiddly stuff','hören · Norddeutsch',418),
+    mk('Feudel','mop rag / floor cloth','hören · Norddeutsch · northern household word',419),
+    mk('nech? / ne?','right? / isn’t it?','hören · Norddeutsch · the northern tag question',420),
+    mk('Hummel Hummel! — Mors Mors!','the Hamburg call & response','Norddeutsch · old Hamburg greeting ritual',421)
+  ];
+}
+
+function migrate(){
+  let changed=false;
+  deck.words.forEach(w=>{if(!w.topic){w.topic='Meine Wörter';changed=true;}});
+  if(!deck.packs){deck.packs=[];changed=true;}
+  if(!deck.inactive){deck.inactive=[];changed=true;}
+  if(deck.packs.indexOf('adjektive')<0){deck.words=deck.words.concat(adjPack());deck.packs.push('adjektive');changed=true;}
+  if(deck.packs.indexOf('praepositionen')<0){deck.words=deck.words.concat(prepPack());deck.packs.push('praepositionen');changed=true;}
+  if(deck.packs.indexOf('floskeln')<0){deck.words=deck.words.concat(floskelnPack());deck.packs.push('floskeln');changed=true;}
+  return changed;
+}
+
+let TOPICS=[];
+function allTopics(){
+  const s=[];
+  deck.words.forEach(w=>{const t=w.topic||'Meine Wörter';if(s.indexOf(t)<0)s.push(t);});
+  return s;
+}
+function topicActive(t){return (deck.inactive||[]).indexOf(t)<0;}
+function toggleTopic(i){
+  const t=TOPICS[i];if(t===undefined)return;
+  deck.inactive=deck.inactive||[];
+  const x=deck.inactive.indexOf(t);
+  if(x>=0)deck.inactive.splice(x,1);else deck.inactive.push(t);
+  saveDeck();renderTopics();startSession();
+}
+function renderTopics(){
+  TOPICS=allTopics();
+  $('topic-chips').innerHTML=TOPICS.map((t,i)=>{
+    const on=topicActive(t);
+    const n=deck.words.filter(w=>(w.topic||'Meine Wörter')===t).length;
+    const tick=on
+      ?'<span class="tick"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg></span>'
+      :'<span class="tick"></span>';
+    return '<button class="tchip'+(on?' on':'')+'" onclick="toggleTopic('+i+')">'+tick+esc(t)+'<span class="tc">'+n+'</span></button>';
+  }).join('');
+  $('topics-dl').innerHTML=TOPICS.map(t=>'<option value="'+esc(t)+'">').join('');
+}
+
+async function loadDeck(){
+  try{
+    const r=await store.get(KEY);
+    if(r&&r.value)return JSON.parse(r.value);
+  }catch(e){}
+  return null;
+}
+function saveDeck(){
+  store.set(KEY,JSON.stringify(deck)).catch(()=>toast('Speichern fehlgeschlagen'));
+}
+
+function updateStats(){
+  const now=Date.now();
+  $('stat-total').textContent=deck.words.length;
+  $('stat-due').textContent=deck.words.filter(w=>topicActive(w.topic||'Meine Wörter')&&(w.due||0)<=now).length;
+}
+
+function show(v){
+  currentView=v;
+  ['study','list','add'].forEach(x=>{
+    $('view-'+x).classList.toggle('hidden',x!==v);
+    $('tab-'+x).classList.toggle('active',x===v);
+  });
+  if(v==='list')renderList();
+  if(v==='study')renderStudy();
+}
+function goAdd(){resetForm();show('add');$('f-word').focus();}
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function startSession(all){
+  const now=Date.now();
+  const pool=deck.words.filter(w=>topicActive(w.topic||'Meine Wörter')&&(all||(w.due||0)<=now));
+  queue=shuffle(pool.map(w=>w.id));
+  qi=0;flipped=false;sessionKnew=0;sessionAgain=0;
+  renderStudy();
+}
+
+function nextDueText(){
+  const now=Date.now();
+  const fut=deck.words.filter(w=>topicActive(w.topic||'Meine Wörter')).map(w=>w.due||0).filter(d=>d>now);
+  if(!fut.length)return'';
+  const days=Math.ceil((Math.min.apply(null,fut)-now)/864e5);
+  return days<=1?'Nächste Wiederholung: morgen.':'Nächste Wiederholung: in '+days+' Tagen.';
+}
+
+function boxDots(b){
+  let s='';
+  for(let i=1;i<=5;i++)s+='<span class="dot'+(i<=(b||1)?' on':'')+'"></span>';
+  return s;
+}
+
+function stateBox(t,p,label,action){
+  return '<div class="state"><div class="state-h">'+t+'</div><div class="state-p">'+p+'</div>'+
+    (label?'<button class="btn knew" onclick="'+action+'">'+label+'</button>':'')+'</div>';
+}
+function doneBox(){
+  return '<div class="state">'+
+    '<svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="25" fill="#E3F2EB"/><path d="M16 27l7 7 13-14" stroke="#0A7A52" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+    '<div class="state-h">Runde geschafft</div>'+
+    '<div class="state-p"><b>'+sessionKnew+'</b> gewusst · <b>'+sessionAgain+'</b> wiederholt</div>'+
+    '<button class="btn knew" onclick="startSession()">Weiter üben</button></div>';
+}
+
+function cardHtml(w){
+  const artTxt=w.art?'<span class="art-'+w.art+'-t">'+w.art+'</span> ':'';
+  const tLen=((w.art?w.art+' ':'')+w.de).length;
+  const tCls=tLen>36?' xlong':tLen>18?' long':'';
+  return '<div class="card'+(flipped?' flipped':'')+'" onclick="flipCard()">'+
+    '<div class="card-inner">'+
+      '<div class="face front">'+
+        '<div class="term'+tCls+'">'+artTxt+esc(w.de)+'</div>'+
+        '<div class="dots">'+boxDots(w.box)+'</div>'+
+      '</div>'+
+      '<div class="face back">'+
+        '<div class="term-sm">'+artTxt+esc(w.de)+'</div>'+
+        '<div class="trans'+(w.en.length>32?' long':'')+'">'+esc(w.en)+'</div>'+
+        (w.ex?'<div class="ex">„'+esc(w.ex)+'“</div>':'')+
+        (w.note?'<div class="note">'+esc(w.note)+'</div>':'')+
+      '</div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="counter">Karte '+(qi+1)+' von '+queue.length+'</div>';
+}
+
+function renderStudy(){
+  updateStats();
+  const stage=$('stage'),acts=$('study-actions'),prog=$('study-progress');
+  while(qi<queue.length&&!deck.words.find(w=>w.id===queue[qi]))qi++;
+
+  if(deck.words.length===0){
+    prog.style.visibility='hidden';acts.innerHTML='';
+    stage.innerHTML=stateBox('Noch keine Wörter','Füg dein erstes Wort hinzu und leg los.','+ Neues Wort','goAdd()');
+    return;
+  }
+  if(queue.length===0){
+    prog.style.visibility='hidden';acts.innerHTML='';
+    const activePool=deck.words.filter(w=>topicActive(w.topic||'Meine Wörter'));
+    if(activePool.length===0){
+      stage.innerHTML=stateBox('Kein Thema aktiv','Tippe oben ein Thema an, um zu lernen.','','');
+    }else{
+      stage.innerHTML=stateBox('Nichts fällig','Alle Karten sind für heute gelernt. '+nextDueText(),'Trotzdem alle üben','startSession(true)');
+    }
+    return;
+  }
+  if(qi>=queue.length){
+    prog.style.visibility='hidden';acts.innerHTML='';
+    stage.innerHTML=doneBox();
+    return;
+  }
+  prog.style.visibility='visible';
+  $('study-bar').style.width=Math.round(qi/queue.length*100)+'%';
+  const w=deck.words.find(x=>x.id===queue[qi]);
+  stage.innerHTML=cardHtml(w);
+  renderActions();
+}
+
+function renderActions(){
+  const acts=$('study-actions');
+  if(deck.words.length===0||queue.length===0||qi>=queue.length){acts.innerHTML='';return;}
+  acts.innerHTML=flipped
+    ?'<div class="grade"><button class="btn again" onclick="gradeCard(false)">Nochmal</button><button class="btn knew" onclick="gradeCard(true)">Gewusst</button></div>'
+    :'<button class="btn ghost" onclick="flipCard()">Antwort zeigen</button>';
+}
+
+function flipCard(){
+  if(qi>=queue.length)return;
+  flipped=!flipped;
+  const c=document.querySelector('.card');
+  if(c)c.classList.toggle('flipped',flipped);
+  renderActions();
+}
+
+function gradeCard(knew){
+  const w=deck.words.find(x=>x.id===queue[qi]);
+  if(!w)return;
+  if(knew){w.box=Math.min(5,(w.box||1)+1);sessionKnew++;}
+  else{w.box=1;sessionAgain++;queue.push(w.id);}
+  const days=INTERVALS[w.box];
+  w.due=days?Date.now()+days*864e5:0;
+  qi++;flipped=false;
+  saveDeck();
+  renderStudy();
+}
+
+function renderList(){
+  const q=($('search').value||'').toLowerCase();
+  const rows=deck.words.filter(w=>((w.art||'')+' '+w.de+' '+w.en+' '+(w.topic||'')).toLowerCase().includes(q));
+  $('count-label').textContent=rows.length+(rows.length===1?' Wort':' Wörter');
+  $('word-list').innerHTML=rows.map(w=>{
+    const g=w.art||'none';
+    return '<div class="row">'+
+      '<span class="gdot g-'+g+'"></span>'+
+      '<div class="row-main" onclick="openEdit(\''+w.id+'\')">'+
+        '<div class="row-de">'+(w.art?w.art+' ':'')+esc(w.de)+'</div>'+
+        '<div class="row-en">'+esc(w.en)+'<span class="row-topic"> · '+esc(w.topic||'Meine Wörter')+'</span></div>'+
+      '</div>'+
+      '<div class="dots small">'+boxDots(w.box)+'</div>'+
+      '<button class="icon-btn'+(armedDelete===w.id?' armed':'')+'" onclick="delWord(\''+w.id+'\')" title="Löschen">'+(armedDelete===w.id?'Sicher?':TRASH)+'</button>'+
+    '</div>';
+  }).join('')||'<div class="empty-list">Nichts gefunden.</div>';
+}
+
+function delWord(id){
+  if(armedDelete!==id){
+    armedDelete=id;renderList();
+    clearTimeout(armTimer);
+    armTimer=setTimeout(()=>{if(armedDelete===id){armedDelete=null;renderList();}},2500);
+    return;
+  }
+  deck.words=deck.words.filter(w=>w.id!==id);
+  queue=queue.filter(x=>x!==id);
+  if(qi>queue.length)qi=queue.length;
+  armedDelete=null;
+  saveDeck();updateStats();renderList();renderTopics();
+  toast('Gelöscht');
+}
+
+function setArt(a,byUser){
+  selArt=a;
+  if(byUser)artTouched=true;
+  document.querySelectorAll('.art-opt').forEach(b=>b.classList.toggle('sel',b.dataset.a===a));
+}
+function resetForm(){
+  editingId=null;setArt('');artTouched=false;
+  ['f-word','f-trans','f-ex','f-note','f-topic'].forEach(i=>$(i).value='');
+  $('form-title').textContent='Neues Wort';
+  $('btn-save').textContent='Speichern';
+  $('btn-cancel').classList.add('hidden');
+}
+function openEdit(id){
+  const w=deck.words.find(x=>x.id===id);
+  if(!w)return;
+  show('add');
+  editingId=id;setArt(w.art||'',true);
+  $('f-word').value=w.de;$('f-trans').value=w.en;$('f-ex').value=w.ex||'';$('f-note').value=w.note||'';$('f-topic').value=w.topic||'Meine Wörter';
+  $('form-title').textContent='Wort bearbeiten';
+  $('btn-save').textContent='Aktualisieren';
+  $('btn-cancel').classList.remove('hidden');
+}
+const SUFFIX=[['schaft','die'],['ismus','der'],['heit','die'],['keit','die'],['ment','das'],['chen','das'],['lein','das'],['ling','der'],['ung','die'],['ion','die'],['tät','die'],['enz','die'],['anz','die'],['ant','der'],['ent','der'],['ist','der'],['eur','der'],['tum','das'],['nis','das'],['ik','die'],['ei','die'],['ie','die'],['ur','die'],['or','der'],['um','das'],['ma','das'],['ich','der'],['ig','der'],['e','die']];
+function guessArticle(w){
+  const s=w.toLowerCase();
+  for(const r of SUFFIX){if(s.length>r[0].length&&s.endsWith(r[0]))return{art:r[1],suf:r[0]};}
+  return null;
+}
+async function aiArticle(word){
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens:1000,
+      messages:[{role:'user',content:'Welcher Artikel gehört zum deutschen Wort "'+word+'"? Antworte mit genau einem Wort: der, die, das oder kein (falls es kein Nomen ist).'}]
+    })
+  });
+  if(!res.ok)throw new Error('api');
+  const data=await res.json();
+  const txt=(data.content||[]).map(c=>c.type==='text'?c.text:'').join(' ').toLowerCase();
+  const m=txt.match(/\b(der|die|das|kein)\b/);
+  if(!m)throw new Error('parse');
+  return m[1];
+}
+async function autoArticle(silent){
+  const input=$('f-word');
+  const word=input.value.trim();
+  if(!word){if(!silent)toast('Erst ein Wort eingeben');return null;}
+  const btn=$('btn-auto');
+  btn.disabled=true;btn.innerHTML='…';
+  let art=null,guessed=false,suf='';
+  try{art=await aiArticle(word);}
+  catch(e){const g=guessArticle(word);if(g){art=g.art;guessed=true;suf=g.suf;}}
+  btn.disabled=false;btn.innerHTML=AUTO_LABEL;
+  if(art===null){toast('Artikel nicht erkannt – bitte selbst wählen');return null;}
+  if(art==='kein'){setArt('',true);if(!silent)toast('Kein Artikel – kein Nomen');return'';}
+  setArt(art,true);
+  input.value=word.charAt(0).toUpperCase()+word.slice(1);
+  toast('Artikel: '+art+(guessed?' (geraten, Endung -'+suf+')':''));
+  return art;
+}
+async function aiFill(fromSave){
+  const wIn=$('f-word');
+  const word=wIn.value.trim();
+  if(!word){if(!fromSave)toast('Erst ein Wort eingeben');return false;}
+  const btn=$('btn-fill');
+  const old=btn.innerHTML;
+  btn.disabled=true;btn.innerHTML='KI denkt …';
+  let ok=false;
+  try{
+    const givenTrans=$('f-trans').value.trim();
+    const prompt='Du hilfst einem Deutschlerner (Niveau A2). Wort: "'+word+'".'+(givenTrans?' Die englische Übersetzung ist: "'+givenTrans+'".':'')+' Antworte NUR mit einem JSON-Objekt ohne Markdown, ohne Erklärung: {"wort":"das Wort in korrekter deutscher Schreibweise, ohne Artikel","artikel":"der|die|das|kein","uebersetzung":"kurze englische Übersetzung","beispiel":"ein einfacher deutscher Beispielsatz (A2-Niveau)","notiz":"sehr kurzer Grammatik-Hinweis auf Deutsch (z.B. Gegenteil, Kasus, trennbar, Plural) oder leerer String"}';
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    if(!res.ok)throw new Error('api');
+    const data=await res.json();
+    const txt=(data.content||[]).map(c=>c.type==='text'?c.text:'').join('').replace(/```json|```/g,'').trim();
+    const j=JSON.parse(txt);
+    if(j.wort&&typeof j.wort==='string')wIn.value=j.wort.trim();
+    if(!artTouched){
+      if(j.artikel==='der'||j.artikel==='die'||j.artikel==='das')setArt(j.artikel,true);
+      else if(j.artikel==='kein')setArt('',true);
+    }
+    if(!$('f-trans').value.trim()&&j.uebersetzung)$('f-trans').value=String(j.uebersetzung).trim();
+    if(!$('f-ex').value.trim()&&j.beispiel)$('f-ex').value=String(j.beispiel).trim();
+    if(!$('f-note').value.trim()&&j.notiz)$('f-note').value=String(j.notiz).trim();
+    ok=true;
+    if(!fromSave)toast('Ausgefüllt – prüfen und speichern');
+  }catch(e){
+    const g=guessArticle(word);
+    if(g&&!artTouched)setArt(g.art,true);
+    if(!fromSave)toast('KI nicht erreichbar');
+  }
+  btn.disabled=false;btn.innerHTML=old;
+  return ok;
+}
+function enterSave(e){if(e.key==='Enter')saveWord();}
+async function saveWord(){
+  if(saving)return;
+  let de=$('f-word').value.trim();
+  if(!de){toast('Erst ein Wort eingeben');return;}
+  saving=true;
+  if(!editingId&&(!$('f-trans').value.trim()||!artTouched)){
+    $('btn-save').textContent='KI füllt aus …';
+    await aiFill(true);
+    de=$('f-word').value.trim();
+  }
+  const en=$('f-trans').value.trim();
+  if(!en){
+    toast('Übersetzung fehlt – bitte ergänzen');
+    $('btn-save').textContent=editingId?'Aktualisieren':'Speichern';
+    saving=false;return;
+  }
+  const ex=$('f-ex').value.trim(),note=$('f-note').value.trim();
+  const topic=$('f-topic').value.trim()||'Meine Wörter';
+  if(editingId){
+    const w=deck.words.find(x=>x.id===editingId);
+    if(w)Object.assign(w,{de,en,ex,note,topic,art:selArt});
+    saveDeck();updateStats();renderTopics();
+    toast('Aktualisiert');
+    resetForm();show('list');
+  }else{
+    const nw={id:'w'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),de,en,ex,note,topic,art:selArt,box:1,due:0,created:Date.now()};
+    deck.words.unshift(nw);
+    if(topicActive(topic))queue.push(nw.id);
+    saveDeck();updateStats();renderTopics();
+    toast(selArt?('Gespeichert: '+selArt+' '+de):'Gespeichert – nächstes Wort?');
+    resetForm();$('f-word').focus();
+  }
+  saving=false;
+}
+
+let toastT=null;
+function toast(m){
+  const t=$('toast');
+  t.textContent=m;t.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+document.addEventListener('keydown',e=>{
+  if(currentView!=='study')return;
+  const tag=document.activeElement&&document.activeElement.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA')return;
+  if(e.code==='Space'){e.preventDefault();flipCard();}
+  else if(flipped&&(e.key==='ArrowLeft'||e.key==='1'))gradeCard(false);
+  else if(flipped&&(e.key==='ArrowRight'||e.key==='2'))gradeCard(true);
+});
+
+(async function init(){
+  const loaded=await loadDeck();
+  if(loaded&&Array.isArray(loaded.words)&&loaded.words.length)deck=loaded;
+  else deck={words:seedWords()};
+  if(migrate())saveDeck();
+  if(!storageOK)$('foot').textContent='Hinweis: Kein dauerhafter Speicher verfügbar – Änderungen gelten nur für diese Sitzung.';
+  renderTopics();
+  updateStats();
+  startSession();
+  show('study');
+})();
+</script>
+</body>
+</html>
