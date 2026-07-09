@@ -2,16 +2,27 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Deutsche Vokabeln & Floskeln lernen — einfache Karteikarten mit Wiederholungssystem.">
+<meta name="theme-color" content="#F4F6F5">
+<meta name="color-scheme" content="light">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wortschatz">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Wortschatz — Moin, Deutsch!</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Poppins',-apple-system,'Segoe UI',Roboto,sans-serif;background:#F4F6F5;color:#111111;min-height:100vh}
+body{font-family:'Poppins',-apple-system,'Segoe UI',Roboto,sans-serif;background:#F4F6F5;color:#111111;min-height:100vh;-webkit-tap-highlight-color:transparent}
+button,input{touch-action:manipulation}
 .hidden{display:none!important}
-.app{max-width:620px;margin:0 auto;padding:28px 20px 60px}
+.app{max-width:620px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) calc(20px + env(safe-area-inset-right,0px)) calc(60px + env(safe-area-inset-bottom,0px)) calc(20px + env(safe-area-inset-left,0px))}
 
 .top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
 .eyebrow{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#0A7A52;margin-bottom:2px}
@@ -35,7 +46,7 @@ h1{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
 .tchip.on .tick{background:#0A7A52;border-color:#0A7A52}
 
 #stage{perspective:1200px;margin-bottom:16px}
-.card{position:relative;height:340px;cursor:pointer}
+.card{position:relative;height:340px;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.75,.25,1)}
 .card.flipped .card-inner{transform:rotateY(180deg)}
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;border:1px solid #E4E7E5;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 30px;box-shadow:0 10px 30px rgba(17,40,30,.06)}
@@ -76,7 +87,7 @@ h1{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
 .state svg{margin-bottom:4px}
 
 .list-head{display:flex;gap:12px;align-items:center;margin-bottom:14px}
-#search{flex:1;height:46px;border:1px solid #E4E7E5;border-radius:13px;padding:0 16px;font:inherit;font-size:14.5px;background:#fff;outline:none;transition:border .15s,box-shadow .15s}
+#search{flex:1;height:46px;border:1px solid #E4E7E5;border-radius:13px;padding:0 16px;font:inherit;font-size:16px;background:#fff;outline:none;transition:border .15s,box-shadow .15s}
 #search:focus{border-color:#0A7A52;box-shadow:0 0 0 3px rgba(10,122,82,.12)}
 #count-label{font-size:13px;color:#9A9A9A;white-space:nowrap}
 .row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E4E7E5;border-radius:15px;padding:13px 15px;margin-bottom:9px}
@@ -96,7 +107,7 @@ h1{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
 .form h2{font-size:18px;font-weight:600;margin-bottom:20px}
 .field{margin-bottom:16px}
 label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8A8F8B;margin-bottom:7px}
-.input{width:100%;height:50px;border:1px solid #E4E7E5;border-radius:13px;padding:0 15px;font:inherit;font-size:15px;outline:none;background:#FBFCFB;transition:border .15s,box-shadow .15s}
+.input{width:100%;height:50px;border:1px solid #E4E7E5;border-radius:13px;padding:0 15px;font:inherit;font-size:16px;outline:none;background:#FBFCFB;transition:border .15s,box-shadow .15s}
 .input:focus{border-color:#0A7A52;box-shadow:0 0 0 3px rgba(10,122,82,.12);background:#fff}
 .art-row{display:flex;gap:8px}
 .art-opt{flex:1;height:44px;border:1.5px solid #E4E7E5;background:#fff;border-radius:12px;font:inherit;font-size:14px;font-weight:600;color:#9A9A9A;cursor:pointer;transition:all .13s}
@@ -116,7 +127,7 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
 .hint{font-size:12px;color:#A0A5A1;margin-top:14px;text-align:center}
 .foot{margin-top:26px;text-align:center;font-size:12px;color:#B7BCB8}
 
-#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);background:#111111;color:#fff;font-size:13.5px;font-weight:500;padding:10px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s;z-index:50}
+#toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(14px);background:#111111;color:#fff;font-size:13.5px;font-weight:500;padding:10px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s;z-index:50}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media (prefers-reduced-motion:reduce){.card-inner{transition:none}#study-bar{transition:none}}
@@ -128,8 +139,18 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
   .trans.long{font-size:19px}
   .card{height:310px}
   h1{font-size:23px}
-  .app{padding:22px 14px 50px}
+  .app{padding:calc(22px + env(safe-area-inset-top,0px)) calc(14px + env(safe-area-inset-right,0px)) calc(50px + env(safe-area-inset-bottom,0px)) calc(14px + env(safe-area-inset-left,0px))}
   .art-opt{font-size:13px}
+}
+@media (max-height:640px) and (orientation:landscape){
+  .card{height:240px}
+  .face{padding:22px 26px}
+  .term{font-size:29px}
+  .term.long{font-size:24px}
+  .term.xlong{font-size:19px}
+  .trans{font-size:21px}
+  .top{margin-bottom:14px}
+  .tabs{margin-bottom:16px}
 }
 </style>
 </head>
@@ -212,7 +233,18 @@ let storageOK=true;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-const store=(window.storage&&typeof window.storage.get==='function')?window.storage:(storageOK=false,{
+function localStore(){
+  try{
+    const t='__ws-test__';
+    localStorage.setItem(t,'1');localStorage.removeItem(t);
+    return{
+      async get(k){const v=localStorage.getItem(k);return v==null?null:{key:k,value:v};},
+      async set(k,v){localStorage.setItem(k,v);return{key:k,value:v};}
+    };
+  }catch(e){return null;}
+}
+const store=(window.storage&&typeof window.storage.get==='function')?window.storage
+  :localStore()||(storageOK=false,{
   _m:{},
   async get(k){return (k in this._m)?{key:k,value:this._m[k]}:null;},
   async set(k,v){this._m[k]=v;return{key:k,value:v};}
@@ -976,18 +1008,25 @@ function guessArticle(w){
   for(const r of SUFFIX){if(s.length>r[0].length&&s.endsWith(r[0]))return{art:r[1],suf:r[0]};}
   return null;
 }
+const AI_MODEL='claude-sonnet-5';
+async function aiMessages(body){
+  const targets=[];
+  if(location.protocol!=='file:')targets.push('api/ai');     // Vercel serverless proxy (needs ANTHROPIC_API_KEY)
+  targets.push('https://api.anthropic.com/v1/messages');     // direct (works inside claude.ai artifacts)
+  for(const url of targets){
+    try{
+      const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(res.ok)return await res.json();
+    }catch(e){}
+  }
+  throw new Error('api');
+}
 async function aiArticle(word){
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-5',
-      max_tokens:1000,
-      messages:[{role:'user',content:'Welcher Artikel gehört zum deutschen Wort "'+word+'"? Antworte mit genau einem Wort: der, die, das oder kein (falls es kein Nomen ist).'}]
-    })
+  const data=await aiMessages({
+    model:AI_MODEL,
+    max_tokens:1000,
+    messages:[{role:'user',content:'Welcher Artikel gehört zum deutschen Wort "'+word+'"? Antworte mit genau einem Wort: der, die, das oder kein (falls es kein Nomen ist).'}]
   });
-  if(!res.ok)throw new Error('api');
-  const data=await res.json();
   const txt=(data.content||[]).map(c=>c.type==='text'?c.text:'').join(' ').toLowerCase();
   const m=txt.match(/\b(der|die|das|kein)\b/);
   if(!m)throw new Error('parse');
@@ -1021,13 +1060,7 @@ async function aiFill(fromSave){
   try{
     const givenTrans=$('f-trans').value.trim();
     const prompt='Du hilfst einem Deutschlerner (Niveau A2). Wort: "'+word+'".'+(givenTrans?' Die englische Übersetzung ist: "'+givenTrans+'".':'')+' Antworte NUR mit einem JSON-Objekt ohne Markdown, ohne Erklärung: {"wort":"das Wort in korrekter deutscher Schreibweise, ohne Artikel","artikel":"der|die|das|kein","uebersetzung":"kurze englische Übersetzung","beispiel":"ein einfacher deutscher Beispielsatz (A2-Niveau)","notiz":"sehr kurzer Grammatik-Hinweis auf Deutsch (z.B. Gegenteil, Kasus, trennbar, Plural) oder leerer String"}';
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})
-    });
-    if(!res.ok)throw new Error('api');
-    const data=await res.json();
+    const data=await aiMessages({model:AI_MODEL,max_tokens:1000,messages:[{role:'user',content:prompt}]});
     const txt=(data.content||[]).map(c=>c.type==='text'?c.text:'').join('').replace(/```json|```/g,'').trim();
     const j=JSON.parse(txt);
     if(j.wort&&typeof j.wort==='string')wIn.value=j.wort.trim();
@@ -1112,6 +1145,10 @@ document.addEventListener('keydown',e=>{
   startSession();
   show('study');
 })();
+
+if('serviceWorker' in navigator&&(location.protocol==='https:'||['localhost','127.0.0.1'].indexOf(location.hostname)>=0)){
+  addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
 </script>
 </body>
 </html>
