@@ -145,6 +145,16 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
 .sync-chip:hover{text-decoration:underline}
 .acct-status{font-size:14.5px;color:#555555;line-height:1.6;margin-bottom:16px}
 
+#cookie-note{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(18px);width:calc(100% - 28px);max-width:600px;background:#fff;border:1px solid #E4E7E5;border-radius:18px;box-shadow:0 12px 40px rgba(17,40,30,.16);padding:16px 18px;display:flex;align-items:center;gap:14px;z-index:60;opacity:0;transition:opacity .35s,transform .35s;pointer-events:none}
+#cookie-note.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#cookie-note .cn-text{flex:1;font-size:13px;line-height:1.55;color:#555555}
+#cookie-note .cn-text b{color:#111111}
+#cookie-note .btn{height:42px;padding:0 20px;font-size:14px;flex:none}
+@media (max-width:460px){
+  #cookie-note{flex-direction:column;align-items:stretch;text-align:center;gap:10px}
+  #cookie-note .btn{width:100%}
+}
+
 #toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(14px);background:#111111;color:#fff;font-size:13.5px;font-weight:500;padding:10px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s;z-index:50}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -250,6 +260,11 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
   </section>
 
   <div class="foot" id="foot"></div>
+</div>
+
+<div id="cookie-note" class="hidden" role="region" aria-label="Cookie-Hinweis">
+  <div class="cn-text"><b>🍪 Nur notwendige Cookies.</b> Fürs Angemeldet-Bleiben setzt die App ein einziges Login-Cookie — kein Tracking, keine Werbung. Deine Wörter bleiben auf dem Gerät bzw. in deinem Konto.</div>
+  <button class="btn knew" onclick="cookieOk()">Alles klar!</button>
 </div>
 
 <div id="toast"></div>
@@ -2014,6 +2029,23 @@ document.addEventListener('keydown',e=>{
   else if(flipped&&['1','2','3','4'].indexOf(e.key)>=0)gradeCard(Number(e.key)-1);
 });
 
+// ---------- Cookie-Hinweis ----------
+const COOKIE_NOTE_KEY='wortschatz-cookie-ok';
+function cookieOk(){
+  try{localStorage.setItem(COOKIE_NOTE_KEY,'1');}catch(e){}
+  const n=$('cookie-note');
+  n.classList.remove('show');
+  setTimeout(()=>n.classList.add('hidden'),380);
+}
+function maybeCookieNote(){
+  let seen=false;
+  try{seen=localStorage.getItem(COOKIE_NOTE_KEY)==='1';}catch(e){}
+  if(seen)return;
+  const n=$('cookie-note');
+  n.classList.remove('hidden');
+  setTimeout(()=>n.classList.add('show'),400);
+}
+
 // ---------- Konto & Sync ----------
 const SYNC_KEY='wortschatz-sync-v1';
 const CLOUD='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 100-9 6 6 0 00-11.6 1.6A3.8 3.8 0 006.8 19z"/></svg>';
@@ -2142,6 +2174,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
   renderSyncChip();
   if(syncMeta)initialSync();
   else if(location.protocol!=='file:')restoreSession();
+  maybeCookieNote();
 })();
 
 if('serviceWorker' in navigator&&(location.protocol==='https:'||['localhost','127.0.0.1'].indexOf(location.hostname)>=0)){
