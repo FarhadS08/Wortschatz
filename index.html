@@ -166,6 +166,19 @@ h1{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
 .list-topics{display:flex;gap:7px;overflow-x:auto;margin-bottom:12px;padding-bottom:3px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .list-topics::-webkit-scrollbar{display:none}
 .ltchip{white-space:nowrap;flex:none}
+.list-states{display:flex;gap:7px;overflow-x:auto;margin-bottom:12px;padding-bottom:3px;scrollbar-width:none}
+.list-states::-webkit-scrollbar{display:none}
+.stchip{white-space:nowrap;flex:none}
+.lg-due{background:#C43020}
+.deck-cover{background:#fff;border:1px solid #E4E7E5;border-radius:15px;padding:13px 15px;margin-bottom:12px}
+.dc-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.dc-top b{font-size:15px}
+.dc-count{font-size:12.5px;color:#9A9A9A;white-space:nowrap}
+.dc-bar{height:5px!important;margin:10px 0 9px;display:flex}
+.dc-legend{display:flex;flex-wrap:wrap;gap:4px 14px}
+.dc-x{border:0;background:none;font:inherit;font-size:12px;font-weight:600;color:#555555;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:2px 0}
+.dc-x:hover{color:#0A7A52}
+.tc-link{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
 .row.open{border-radius:15px 15px 0 0;margin-bottom:0;border-bottom-color:#F0F2F1}
 .wdetail{background:#fff;border:1px solid #E4E7E5;border-top:0;border-radius:0 0 15px 15px;margin:0 0 9px;padding:13px 15px 15px}
 .wd-status{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
@@ -294,6 +307,13 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
 
   <section id="view-list" class="hidden">
     <div class="list-topics" id="list-topics"></div>
+    <div class="list-states" id="list-states">
+      <button class="schip stchip on" data-s="" onclick="setListState('')" data-i18n="row.all">Alle</button>
+      <button class="schip stchip" data-s="new" onclick="setListState('new')" data-i18n="mode.new">Neue</button>
+      <button class="schip stchip" data-s="lrn" onclick="setListState('lrn')" data-i18n="wd.learning">Am Lernen</button>
+      <button class="schip stchip" data-s="rev" onclick="setListState('rev')" data-i18n="wd.learned">Gelernt</button>
+      <button class="schip stchip" data-s="due" onclick="setListState('due')" data-i18n="mode.due">Fällige</button>
+    </div>
     <div class="list-head">
       <input id="search" placeholder="Suchen …" data-i18n-ph="ls.search" oninput="renderList()">
       <span id="count-label"></span>
@@ -363,7 +383,7 @@ let queue=[],qi=0,flipped=false,sessionKnew=0,sessionAgain=0;
 let practice=false,roundIds=[],toPresent=new Set();
 let sessionSeen=new Set(),roundInfo=null;
 let selectMode=false,selIds=new Set();
-let listTopic='',expandedId=null,lastLT='';
+let listTopic='',listState='',expandedId=null,lastLT='';
 let editingId=null,armedDelete=null,armTimer=null,selArt='',currentView='study';
 let artTouched=false,saving=false;
 let storageOK=true;
@@ -1763,7 +1783,7 @@ function renderTopics(){
     const emptyCustom=s.total===0&&(deck.customTopics||[]).indexOf(tp)>=0;
     const tcHtml=emptyCustom
       ?'<span class="tc tc-x" title="'+esc(t('tp.removetitle'))+'" onclick="removeTopic(event,'+i+')">×</span>'
-      :'<span class="tc">'+cnt+'</span>';
+      :'<span class="tc tc-link" onclick="openDeck(event,'+i+')">'+cnt+'</span>';
     return '<button class="tchip'+(on?' on':'')+'" title="'+info+'" onclick="toggleTopic('+i+')">'+tick+
       '<span class="tlbl">'+esc(tp)+(en?'<span class="tsub">'+esc(en)+'</span>':'')+bar+'</span>'+
       tcHtml+'</button>';
@@ -2217,6 +2237,37 @@ function setListTopic(i){
   expandedId=null;
   renderList();
 }
+function setListState(s){
+  listState=s;
+  expandedId=null;
+  renderList();
+}
+function syncListState(){
+  document.querySelectorAll('.stchip').forEach(b=>b.classList.toggle('on',b.dataset.s===listState));
+}
+function openDeck(e,i){
+  e.stopPropagation();
+  const tp=TOPICS[i];
+  if(tp===undefined)return;
+  listTopic=tp;listState='';expandedId=null;
+  show('list');
+}
+function coverHtml(){
+  if(!listTopic)return'';
+  const s=topicStats(listTopic);
+  const now=Date.now();
+  const due=deck.words.filter(w=>(w.topic||'Meine Wörter')===listTopic&&(w.due||0)<=now).length;
+  return '<div class="deck-cover">'+
+    '<div class="dc-top"><b>'+esc(listTopic)+'</b><span class="dc-count">'+s.total+' '+esc(t('ls.wordsN'))+(s.total>0&&s.nw===0?' ✓':'')+'</span></div>'+
+    '<span class="tbar dc-bar"><span class="tb tb-rev" style="width:'+(s.total?s.rev/s.total*100:0).toFixed(1)+'%"></span><span class="tb tb-lrn" style="width:'+(s.total?s.lrn/s.total*100:0).toFixed(1)+'%"></span></span>'+
+    '<div class="dc-legend">'+
+      '<button class="dc-x" onclick="setListState(\'new\')"><span class="lg-dot lg-new"></span>'+s.nw+' '+esc(t('mode.new'))+'</button>'+
+      '<button class="dc-x" onclick="setListState(\'lrn\')"><span class="lg-dot lg-lrn"></span>'+s.lrn+' '+esc(t('wd.learning'))+'</button>'+
+      '<button class="dc-x" onclick="setListState(\'rev\')"><span class="lg-dot lg-rev"></span>'+s.rev+' '+esc(t('wd.learned'))+'</button>'+
+      '<button class="dc-x" onclick="setListState(\'due\')"><span class="lg-dot lg-due"></span>'+due+' '+esc(t('mode.due'))+'</button>'+
+    '</div>'+
+  '</div>';
+}
 function toggleExpand(id){
   expandedId=expandedId===id?null:id;
   renderList();
@@ -2269,7 +2320,19 @@ function detailHtml(w){
 function renderList(){
   renderListTopics();
   const q=($('search').value||'').toLowerCase();
-  const rows=deck.words.filter(w=>(!listTopic||(w.topic||'Meine Wörter')===listTopic)&&((w.art||'')+' '+w.de+' '+w.en+' '+(w.topic||'')).toLowerCase().includes(q));
+  const nowF=Date.now();
+  const rows=deck.words.filter(w=>{
+    if(listTopic&&(w.topic||'Meine Wörter')!==listTopic)return false;
+    if(listState){
+      nrm(w);
+      if(listState==='new'&&w.phase!=='new')return false;
+      if(listState==='lrn'&&!(w.phase==='learn'||w.phase==='relearn'))return false;
+      if(listState==='rev'&&w.phase!=='review')return false;
+      if(listState==='due'&&(w.due||0)>nowF)return false;
+    }
+    return ((w.art||'')+' '+w.de+' '+w.en+' '+(w.topic||'')).toLowerCase().includes(q);
+  });
+  syncListState();
   $('count-label').textContent=rows.length+' '+(rows.length===1?t('ls.words1'):t('ls.wordsN'));
   const ll=curLang();
   if(ll!=='en'&&ll!=='de'&&!trBusy){
@@ -2278,7 +2341,7 @@ function renderList(){
     if(need.length)translateWords(need).then(ok=>{if(ok&&currentView==='list')renderList();});
   }
   const TICK='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l5 5L20 7"/></svg>';
-  $('word-list').innerHTML=rows.map(w=>{
+  $('word-list').innerHTML=coverHtml()+rows.map(w=>{
     const g=w.art||'none';
     if(selectMode){
       const on=selIds.has(w.id);
