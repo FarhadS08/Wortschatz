@@ -37,6 +37,18 @@ h1{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
 .progress{height:5px;background:#E6E9E7;border-radius:99px;margin-bottom:18px;overflow:hidden}
 #study-bar{height:100%;width:0;background:#0A7A52;border-radius:99px;transition:width .3s}
 
+.gami{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1px solid #E4E7E5;border-radius:15px;padding:10px 18px;margin-bottom:16px}
+.g-item{display:flex;align-items:center;gap:9px;border:0;background:none;font:inherit;padding:0}
+.g-goal{cursor:pointer;border-radius:10px}
+.g-txt{display:flex;flex-direction:column;line-height:1.15;text-align:left}
+.g-txt b{font-size:15px;color:#111111}
+.g-txt span{font-size:10.5px;color:#9A9A9A}
+.g-emoji{font-size:19px}
+.g-sep{width:1px;height:28px;background:#EDEFEE;flex:none}
+.confetti{position:fixed;top:-14px;width:8px;height:13px;border-radius:2px;z-index:70;pointer-events:none;animation:confetti-fall 1.5s cubic-bezier(.25,.8,.5,1) forwards}
+@keyframes confetti-fall{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),105vh) rotate(var(--rot));opacity:.9}}
+@media (prefers-reduced-motion:reduce){.confetti{display:none}}
+
 .topics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
 .tchip{border:1.5px solid #E4E7E5;background:#fff;color:#9A9A9A;border-radius:999px;padding:7px 14px 7px 10px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .13s}
 .tchip:hover{border-color:#C9CFCB}
@@ -228,6 +240,7 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
   </div>
 
   <section id="view-study">
+    <div class="gami" id="gami"></div>
     <div class="topics" id="topic-chips"></div>
     <div class="topic-legend"><span><span class="lg-dot lg-rev"></span>gelernt</span><span><span class="lg-dot lg-lrn"></span>am Lernen</span><span><span class="lg-dot lg-new"></span>neu</span></div>
     <div class="size-row" id="size-row">
@@ -1686,6 +1699,7 @@ function updateStats(){
   $('stat-total').textContent=deck.words.length;
   $('stat-due').textContent=deck.words.filter(w=>topicActive(w.topic||'Meine Wörter')&&(w.due||0)<=now).length;
   renderTopics();
+  renderGami();
 }
 
 function show(v){
@@ -1755,6 +1769,82 @@ function lvl(w){
   if(w.phase==='new')return 1;
   if(w.phase==='learn'||w.phase==='relearn')return 2;
   return w.ivl<6?3:w.ivl<21?4:5;
+}
+// ---------- Gamification: Serie + Tagesziel ----------
+function dateStr(t){const d=new Date(t);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function todayStr(){return dateStr(Date.now());}
+function gamiGet(){
+  if(!deck.gami)deck.gami={day:todayStr(),today:0,streak:0,best:0,last:'',goal:20,goalHit:false};
+  return deck.gami;
+}
+function gamiTick(){
+  const d=todayStr();
+  const g=gamiGet();
+  if(g.day!==d){g.day=d;g.today=0;g.goalHit=false;}
+  if(g.today===0&&g.last!==d){
+    const yest=dateStr(Date.now()-864e5);
+    g.streak=(g.last===yest)?(g.streak||0)+1:1;
+    g.last=d;
+    if(g.streak>(g.best||0))g.best=g.streak;
+  }
+  g.today++;
+  if(!g.goalHit&&g.today>=(g.goal||20)){
+    g.goalHit=true;
+    celebrate();
+  }
+}
+function gamiLine(){
+  const g=deck.gami;
+  if(!g)return'';
+  const t=g.day===todayStr()?g.today:0;
+  return '<br>Heute: <b>'+t+'</b> von '+(g.goal||20)+' Karten.';
+}
+function cycleGoal(){
+  const opts=[10,20,30,50];
+  const g=gamiGet();
+  g.goal=opts[(opts.indexOf(g.goal||20)+1)%opts.length];
+  const t=g.day===todayStr()?g.today:0;
+  g.goalHit=t>=g.goal;
+  saveDeck();
+  renderGami();
+  toast('Tagesziel: '+g.goal+' Karten');
+}
+function renderGami(){
+  const el=$('gami');
+  if(!el)return;
+  const d=todayStr();
+  const g=deck.gami||{today:0,streak:0,best:0,last:'',goal:20,day:d};
+  const today=g.day===d?g.today:0;
+  const yest=dateStr(Date.now()-864e5);
+  const streak=(g.last===d||g.last===yest)?(g.streak||0):0;
+  const goal=g.goal||20;
+  const pct=Math.min(1,today/goal);
+  const R=9.5,C=2*Math.PI*R;
+  el.innerHTML=
+    '<div class="g-item"><span class="g-emoji">🔥</span><div class="g-txt"><b>'+streak+'</b><span>Tage-Serie</span></div></div>'+
+    '<div class="g-sep"></div>'+
+    '<button class="g-item g-goal" onclick="cycleGoal()" title="Tippen, um das Tagesziel zu ändern">'+
+      '<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="'+R+'" fill="none" stroke="#E6E9E7" stroke-width="4"/><circle cx="14" cy="14" r="'+R+'" fill="none" stroke="'+(pct>=1?'#0A7A52':'#0A7A52')+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-pct)).toFixed(1)+'" transform="rotate(-90 14 14)"/></svg>'+
+      '<div class="g-txt"><b>'+today+'</b><span>von '+goal+' heute</span></div>'+
+    '</button>'+
+    '<div class="g-sep"></div>'+
+    '<div class="g-item"><span class="g-emoji">🏆</span><div class="g-txt"><b>'+(g.best||0)+'</b><span>Rekord</span></div></div>';
+}
+function celebrate(){
+  const g=deck.gami;
+  toast('Tagesziel erreicht! 🔥 '+(g&&g.streak?g.streak+'-Tage-Serie':'Weiter so!'));
+  const colors=['#0A7A52','#E8A13D','#C43020','#1A3C8A','#7BC7A3'];
+  for(let i=0;i<26;i++){
+    const p=document.createElement('div');
+    p.className='confetti';
+    p.style.left=(15+Math.random()*70)+'%';
+    p.style.background=colors[i%colors.length];
+    p.style.animationDelay=(Math.random()*0.25)+'s';
+    p.style.setProperty('--dx',(Math.random()*180-90)+'px');
+    p.style.setProperty('--rot',(Math.random()*720-360)+'deg');
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),1900);
+  }
 }
 function sessionSize(){return deck.sessionSize||0;}
 function setSize(n){
@@ -1833,6 +1923,7 @@ function presentNext(known){
     w.due=Date.now()+r.dueMs;
     sessionKnew++;
     sessionSeen.add(id);
+    gamiTick();
     saveDeck();
   }else if(!known){
     queue.push(id);
@@ -1875,7 +1966,7 @@ function doneBox(){
   }
   return '<div class="state">'+svg+
     '<div class="state-h">Runde geschafft</div>'+
-    '<div class="state-p"><b>'+sessionKnew+'</b> gewusst · <b>'+sessionAgain+'</b> wiederholt'+(left?'<br>Noch <b>'+left+'</b> Karten fällig.':'')+'</div>'+
+    '<div class="state-p"><b>'+sessionKnew+'</b> gewusst · <b>'+sessionAgain+'</b> wiederholt'+(left?'<br>Noch <b>'+left+'</b> Karten fällig.':'')+gamiLine()+'</div>'+
     '<button class="btn knew" onclick="startSession()">'+(left?'Nächste Runde':'Weiter üben')+'</button>'+
     (roundIds.length?'<button class="btn ghost" onclick="repeatRound()">Diese Runde wiederholen</button>':'')+'</div>';
 }
@@ -1982,6 +2073,8 @@ function gradeCard(q){
   if(!w)return;
   if(practice){
     if(q===0){sessionAgain++;queue.push(w.id);}else{sessionKnew++;}
+    gamiTick();
+    saveDeck();
     qi++;flipped=false;
     renderStudy();
     return;
@@ -1996,6 +2089,7 @@ function gradeCard(q){
   if(q===0){sessionAgain++;}else{sessionKnew++;}
   if(r.requeue)queue.push(w.id);
   else sessionSeen.add(w.id);
+  gamiTick();
   qi++;flipped=false;
   saveDeck();
   renderStudy();

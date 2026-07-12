@@ -31,6 +31,7 @@ You stay logged in via a secure (`HttpOnly`) session cookie that renews itself f
 - **AI assist** — type just the German word and the AI fills in the article, translation, example sentence (with English translation) and a grammar note
 - **Example translations** — cards with an example sentence show its English translation right below it
 - **Search & edit** — full word list with search, inline edit and delete
+- **Streak & daily goal** — a slim strip above the deck shows your 🔥 day streak (any day with at least one graded card keeps it alive), a daily-goal ring (tap to cycle 10/20/30/50 cards) with a confetti moment when you reach it, and your 🏆 record streak; all of it syncs with your account
 
 ## Built-in categories
 
