@@ -141,6 +141,9 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
 #btn-cancel{padding:0 22px;background:#F2F4F3;color:#555555}
 .hint{font-size:12px;color:#A0A5A1;margin-top:14px;text-align:center}
 .foot{margin-top:26px;text-align:center;font-size:12px;color:#B7BCB8}
+.sync-chip{border:0;background:transparent;color:#0A7A52;font:inherit;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:2px 0;margin-top:3px}
+.sync-chip:hover{text-decoration:underline}
+.acct-status{font-size:14.5px;color:#555555;line-height:1.6;margin-bottom:16px}
 
 #toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(14px);background:#111111;color:#fff;font-size:13.5px;font-weight:500;padding:10px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s;z-index:50}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -179,7 +182,7 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
       <div class="eyebrow">Moin, Deutsch!</div>
       <h1>Wortschatz</h1>
     </div>
-    <div class="stats"><b id="stat-total">0</b> Wörter · <b id="stat-due">0</b> fällig</div>
+    <div class="stats"><b id="stat-total">0</b> Wörter · <b id="stat-due">0</b> fällig<br><button class="sync-chip" id="sync-chip" onclick="show('account')"></button></div>
   </div>
 
   <div class="tabs">
@@ -236,6 +239,13 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
         <button class="btn hidden" id="btn-cancel" onclick="resetForm();show('list')">Abbrechen</button>
       </div>
       <div class="hint">Nur das Wort eingeben + Enter → KI füllt Artikel, Übersetzung &amp; Beispiel aus</div>
+    </div>
+  </section>
+
+  <section id="view-account" class="hidden">
+    <div class="form">
+      <h2>Konto &amp; Sync</h2>
+      <div id="acct-box"></div>
     </div>
   </section>
 
@@ -1598,7 +1608,8 @@ async function loadDeck(){
   }catch(e){}
   return null;
 }
-function saveDeck(){
+function saveDeck(touch){
+  if(touch!==false){deck.updatedAt=Date.now();schedulePush();}
   store.set(KEY,JSON.stringify(deck)).catch(()=>toast('Speichern fehlgeschlagen'));
 }
 
@@ -1610,12 +1621,14 @@ function updateStats(){
 
 function show(v){
   currentView=v;
-  ['study','list','add'].forEach(x=>{
+  ['study','list','add','account'].forEach(x=>{
     $('view-'+x).classList.toggle('hidden',x!==v);
-    $('tab-'+x).classList.toggle('active',x===v);
+    const tb=$('tab-'+x);
+    if(tb)tb.classList.toggle('active',x===v);
   });
   if(v==='list')renderList();
   if(v==='study')renderStudy();
+  if(v==='account')renderAccount();
 }
 function goAdd(){resetForm();show('add');$('f-word').focus();}
 
@@ -2001,17 +2014,122 @@ document.addEventListener('keydown',e=>{
   else if(flipped&&['1','2','3','4'].indexOf(e.key)>=0)gradeCard(Number(e.key)-1);
 });
 
+// ---------- Konto & Sync ----------
+const SYNC_KEY='wortschatz-sync-v1';
+const CLOUD='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 100-9 6 6 0 00-11.6 1.6A3.8 3.8 0 006.8 19z"/></svg>';
+let syncMeta=null,pushTimer=null,pushPending=false;
+function loadSyncMeta(){try{syncMeta=JSON.parse(localStorage.getItem(SYNC_KEY))||null;}catch(e){syncMeta=null;}}
+function saveSyncMeta(){try{if(syncMeta)localStorage.setItem(SYNC_KEY,JSON.stringify(syncMeta));else localStorage.removeItem(SYNC_KEY);}catch(e){}}
+async function syncApi(body){
+  let res;
+  try{res=await fetch('api/sync',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});}
+  catch(e){const er=new Error('network');er.status=0;throw er;}
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok){const er=new Error(data.error||('http-'+res.status));er.status=res.status;throw er;}
+  return data;
+}
+function errMsg(e){
+  const m={'user-exists':'Benutzername schon vergeben','bad-credentials':'Falscher Name oder falsches Passwort','bad-user':'Benutzername: 3–64 Zeichen (Buchstaben, Zahlen, . _ @ + -)','bad-pass':'Passwort: mindestens 6 Zeichen','not-configured':'Sync-Server nicht eingerichtet (siehe README)','too-large':'Deck zu groß für Sync','unauthorized':'Sitzung abgelaufen – bitte neu anmelden'};
+  if(e.status===0)return'Server nicht erreichbar';
+  return m[e.message]||'Sync-Fehler ('+e.message+')';
+}
+function renderSyncChip(){
+  const c=$('sync-chip');
+  if(c)c.innerHTML=CLOUD+(syncMeta?esc(syncMeta.user):'Konto & Sync');
+}
+function renderAccount(){
+  const el=$('acct-box');
+  if(!el)return;
+  if(!syncMeta){
+    el.innerHTML='<div class="acct-status">Mit einem Konto werden deine Wörter und dein Lernfortschritt zwischen allen Geräten synchronisiert.</div>'+
+      '<div class="field"><label>Benutzername / E-Mail</label><input id="f-user" class="input" autocomplete="username" placeholder="farhad"></div>'+
+      '<div class="field"><label>Passwort</label><input id="f-pass" type="password" class="input" autocomplete="current-password" placeholder="mindestens 6 Zeichen"></div>'+
+      '<div class="form-actions"><button class="btn knew" onclick="acctLogin(false)">Anmelden</button><button class="btn ghost" style="flex:1" onclick="acctLogin(true)">Registrieren</button></div>'+
+      '<div class="hint">Funktioniert auf der eigenen Website (Vercel) mit eingerichtetem Sync-Server.</div>';
+  }else{
+    el.innerHTML='<div class="acct-status">Angemeldet als <b>'+esc(syncMeta.user)+'</b>'+(syncMeta.lastSync?('<br>Zuletzt synchronisiert: '+new Date(syncMeta.lastSync).toLocaleString('de-DE')):'')+'</div>'+
+      '<div class="form-actions"><button class="btn knew" onclick="syncNow()">Jetzt synchronisieren</button><button class="btn ghost" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="acctLogout()">Abmelden</button></div>'+
+      '<div class="hint">Automatisch: beim Öffnen wird geladen, nach Änderungen gespeichert. Der neueste Stand gewinnt.</div>';
+  }
+  renderSyncChip();
+}
+async function acctLogin(reg){
+  const user=$('f-user').value.trim().toLowerCase(),pass=$('f-pass').value;
+  if(!user){toast('Benutzername fehlt');return;}
+  if(pass.length<6){toast('Passwort: mindestens 6 Zeichen');return;}
+  try{
+    const r=await syncApi({action:reg?'register':'login',user,pass});
+    syncMeta={user:r.user,token:r.token};saveSyncMeta();
+    toast(reg?'Konto erstellt':'Angemeldet');
+    await initialSync();
+    renderAccount();
+  }catch(e){toast(errMsg(e));}
+}
+async function acctLogout(){
+  if(syncMeta){syncApi({action:'logout',token:syncMeta.token}).catch(()=>{});}
+  syncMeta=null;saveSyncMeta();renderAccount();
+  toast('Abgemeldet – Wörter bleiben auf diesem Gerät');
+}
+async function syncNow(){
+  try{await initialSync(true);toast('Synchronisiert');}catch(e){toast(errMsg(e));}
+  renderAccount();
+}
+async function initialSync(rethrow){
+  if(!syncMeta)return;
+  try{
+    const r=await syncApi({action:'pull',token:syncMeta.token});
+    const sdeck=r.deck;
+    const lu=deck.updatedAt||0,su=(sdeck&&sdeck.updatedAt)||0;
+    if(sdeck&&su>lu){
+      deck=sdeck;
+      if(migrate())saveDeck(false);else saveDeck(false);
+      renderTopics();syncSize();updateStats();startSession();
+      if(currentView==='list')renderList();
+      toast('Neuester Stand vom Server geladen');
+    }else if(!sdeck||lu>su){
+      await doPush(true);
+    }
+    syncMeta.lastSync=Date.now();saveSyncMeta();
+    if(currentView==='account')renderAccount();
+  }catch(e){
+    if(e.status===401){syncMeta=null;saveSyncMeta();renderAccount();toast(errMsg(e));}
+    else if(rethrow)throw e;
+  }
+}
+function schedulePush(){
+  if(!syncMeta)return;
+  pushPending=true;
+  clearTimeout(pushTimer);
+  pushTimer=setTimeout(doPush,1500);
+}
+async function doPush(rethrow){
+  if(!syncMeta)return;
+  pushPending=false;clearTimeout(pushTimer);
+  try{
+    await syncApi({action:'push',token:syncMeta.token,deck});
+    syncMeta.lastSync=Date.now();saveSyncMeta();
+    if(currentView==='account')renderAccount();
+  }catch(e){
+    if(e.status===401){syncMeta=null;saveSyncMeta();renderAccount();toast(errMsg(e));}
+    else if(rethrow)throw e;
+  }
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&pushPending)doPush();});
+
 (async function init(){
   const loaded=await loadDeck();
   if(loaded&&Array.isArray(loaded.words)&&loaded.words.length)deck=loaded;
   else deck={words:seedWords()};
-  if(migrate())saveDeck();
+  if(migrate())saveDeck(false);
   if(!storageOK)$('foot').textContent='Hinweis: Kein dauerhafter Speicher verfügbar – Änderungen gelten nur für diese Sitzung.';
   renderTopics();
   syncSize();
   updateStats();
   startSession();
   show('study');
+  loadSyncMeta();
+  renderSyncChip();
+  if(syncMeta)initialSync();
 })();
 
 if('serviceWorker' in navigator&&(location.protocol==='https:'||['localhost','127.0.0.1'].indexOf(location.hostname)>=0)){

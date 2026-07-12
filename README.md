@@ -24,7 +24,19 @@ Without the key everything still works — the AI buttons fall back to built-in 
 - **Offline**: a service worker caches the app; your words are stored in `localStorage` on the device.
 - **Responsive**: layouts for small phones (320 px+), notched screens (safe areas), landscape, tablet and desktop.
 
-> Note: words live in the browser you saved them in — there is no account/sync between devices.
+> Words are stored in the browser (localStorage) and can additionally sync between devices with an account — see below.
+
+## Accounts & sync
+
+The app has built-in accounts ("Konto & Sync" via the cloud button in the header): register once, log in on each device, and your words plus the full learning progress sync automatically — the deck is pulled when the app opens and pushed ~1.5 s after every change; the newest state wins.
+
+Server setup (once, ~2 minutes):
+
+1. In your Vercel project open the **Storage** tab and create/connect an **Upstash for Redis** database (free tier is plenty). Vercel injects the connection env vars (`KV_REST_API_URL`/`KV_REST_API_TOKEN` or `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN`) automatically — `api/sync.js` accepts either pair.
+2. Redeploy the project.
+3. Open the app → cloud button → **Registrieren**.
+
+Notes: passwords are stored scrypt-hashed, sessions last 90 days, decks are private per account. There is no password reset (no e-mail service) — if you lose the password, register a new account; the words on your device stay untouched. Without the Redis integration the sync endpoint answers 501 and the app simply keeps working locally.
 
 ## Features
 
