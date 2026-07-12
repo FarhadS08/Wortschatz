@@ -2045,7 +2045,7 @@ function renderAccount(){
       '<div class="field"><label>Benutzername / E-Mail</label><input id="f-user" class="input" autocomplete="username" placeholder="farhad"></div>'+
       '<div class="field"><label>Passwort</label><input id="f-pass" type="password" class="input" autocomplete="current-password" placeholder="mindestens 6 Zeichen"></div>'+
       '<div class="form-actions"><button class="btn knew" onclick="acctLogin(false)">Anmelden</button><button class="btn ghost" style="flex:1" onclick="acctLogin(true)">Registrieren</button></div>'+
-      '<div class="hint">Funktioniert auf der eigenen Website (Vercel) mit eingerichtetem Sync-Server.</div>';
+      '<div class="hint">Beim Anmelden wird ein notwendiges Cookie gesetzt, damit du angemeldet bleibst — keine Tracking-Cookies. Funktioniert auf der eigenen Website (Vercel) mit eingerichtetem Sync-Server.</div>';
   }else{
     el.innerHTML='<div class="acct-status">Angemeldet als <b>'+esc(syncMeta.user)+'</b>'+(syncMeta.lastSync?('<br>Zuletzt synchronisiert: '+new Date(syncMeta.lastSync).toLocaleString('de-DE')):'')+'</div>'+
       '<div class="form-actions"><button class="btn knew" onclick="syncNow()">Jetzt synchronisieren</button><button class="btn ghost" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="acctLogout()">Abmelden</button></div>'+
