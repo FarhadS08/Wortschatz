@@ -36,7 +36,7 @@ Server setup (once, ~2 minutes):
 2. Redeploy the project.
 3. Open the app → cloud button → **Registrieren**.
 
-Notes: passwords are stored scrypt-hashed, sessions last 90 days, decks are private per account. There is no password reset (no e-mail service) — if you lose the password, register a new account; the words on your device stay untouched. Without the Redis integration the sync endpoint answers 501 and the app simply keeps working locally.
+Notes: passwords are stored scrypt-hashed, decks are private per account. Sessions live in an `HttpOnly`/`SameSite=Lax` cookie (not readable by JavaScript) that slides forward 90 days on every visit — you stay logged in even if the browser evicts localStorage, and the deck is restored from the server automatically. There is no password reset (no e-mail service) — if you lose the password, register a new account; the words on your device stay untouched. Without the Redis integration the sync endpoint answers 501 and the app simply keeps working locally.
 
 ## Features
 

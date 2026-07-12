@@ -2059,11 +2059,22 @@ async function acctLogin(reg){
   if(pass.length<6){toast('Passwort: mindestens 6 Zeichen');return;}
   try{
     const r=await syncApi({action:reg?'register':'login',user,pass});
-    syncMeta={user:r.user,token:r.token};saveSyncMeta();
+    syncMeta={user:r.user};saveSyncMeta();
     toast(reg?'Konto erstellt':'Angemeldet');
     await initialSync();
     renderAccount();
   }catch(e){toast(errMsg(e));}
+}
+async function restoreSession(){
+  try{
+    const r=await syncApi({action:'me'});
+    if(r&&r.user){
+      syncMeta={user:r.user};saveSyncMeta();
+      renderSyncChip();
+      if(currentView==='account')renderAccount();
+      initialSync();
+    }
+  }catch(e){}
 }
 async function acctLogout(){
   if(syncMeta){syncApi({action:'logout',token:syncMeta.token}).catch(()=>{});}
@@ -2130,6 +2141,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
   loadSyncMeta();
   renderSyncChip();
   if(syncMeta)initialSync();
+  else if(location.protocol!=='file:')restoreSession();
 })();
 
 if('serviceWorker' in navigator&&(location.protocol==='https:'||['localhost','127.0.0.1'].indexOf(location.hostname)>=0)){

@@ -30,7 +30,21 @@ async function kv(cmd) {
     return 'OK';
   }
   if (op === 'DEL') return mem.delete(key) ? 1 : 0;
+  if (op === 'EXPIRE') return mem.has(key) ? 1 : 0;
   throw new Error('unsupported ' + op);
+}
+
+const TOKEN_TTL = 7776000; // 90 days
+function cookieToken(req) {
+  const c = req.headers && req.headers.cookie;
+  if (!c) return '';
+  const m = /(?:^|;\s*)ws_token=([0-9a-f]{48})(?:;|$)/.exec(c);
+  return m ? m[1] : '';
+}
+function setTokenCookie(req, res, token, clear) {
+  const secure = (req.headers && req.headers['x-forwarded-proto'] === 'https') ? '; Secure' : '';
+  res.setHeader('Set-Cookie', 'ws_token=' + (clear ? '' : token) +
+    '; Max-Age=' + (clear ? 0 : TOKEN_TTL) + '; Path=/; HttpOnly; SameSite=Lax' + secure);
 }
 
 const ok = (res, o) => res.status(200).json(o);
@@ -61,20 +75,29 @@ module.exports = async function handler(req, res) {
         if (!crypto.timingSafeEqual(h, Buffer.from(rec.hash, 'hex'))) return err(res, 401, 'bad-credentials');
       }
       const token = crypto.randomBytes(24).toString('hex');
-      await kv(['SET', 't:' + token, user, 'EX', 7776000]); // 90 days
-      return ok(res, { token, user });
+      await kv(['SET', 't:' + token, user, 'EX', TOKEN_TTL]);
+      setTokenCookie(req, res, token);
+      return ok(res, { user });
     }
 
-    const token = String(b.token || '');
+    const token = cookieToken(req) || String(b.token || '');
     if (!/^[0-9a-f]{48}$/.test(token)) return err(res, 401, 'unauthorized');
     const user = await kv(['GET', 't:' + token]);
     if (!user) return err(res, 401, 'unauthorized');
 
     if (action === 'logout') {
       await kv(['DEL', 't:' + token]);
+      setTokenCookie(req, res, '', true);
       return ok(res, { ok: true });
     }
+    if (action === 'me') {
+      await kv(['EXPIRE', 't:' + token, TOKEN_TTL]);
+      setTokenCookie(req, res, token);
+      return ok(res, { user });
+    }
     if (action === 'pull') {
+      await kv(['EXPIRE', 't:' + token, TOKEN_TTL]);
+      setTokenCookie(req, res, token);
       const raw = await kv(['GET', 'd:' + user]);
       return ok(res, { deck: raw ? JSON.parse(raw) : null });
     }
