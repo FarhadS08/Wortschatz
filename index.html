@@ -71,6 +71,21 @@ h1{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
 .rm-bar:hover{border-color:#D9BC6F}
 .rm-bar .rv-go{background:#F7EBCB;color:#92600A}
 #rm-sub{font-size:11.5px;color:#8A8F8B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm-wrap{position:relative;margin-bottom:6px;overflow:hidden}
+.tm-tile{position:absolute;border:1.5px solid;border-radius:7px;overflow:hidden;cursor:pointer;box-sizing:border-box;padding:3px 5px;transition:opacity .15s;user-select:none}
+.tm-tile:hover{filter:brightness(.97)}
+.tm-tile.off{opacity:.32;border-style:dashed}
+.tm-e{position:absolute;left:5px;bottom:16px;font-size:14px;line-height:1}
+.tm-n{position:absolute;left:5px;right:4px;bottom:3px;font-size:9px;font-weight:600;color:#3E453F;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm-c{position:absolute;top:2px;right:5px;font-size:9px;font-weight:600;color:rgba(0,0,0,.38)}
+.tm-rem{position:absolute;top:2px;left:4px;font-size:9px}
+.tm-tile.sm .tm-n{display:none}
+.tm-tile.sm .tm-e{bottom:3px}
+.tm-tile.xs .tm-e{font-size:11px;left:3px;bottom:2px}
+.tm-tile.xs .tm-c{display:none}
+.tm-leg{display:flex;gap:14px;justify-content:center;font-size:10.5px;color:#8A8F8B;margin-bottom:8px}
+.tm-leg span{display:flex;align-items:center;gap:4px}
+.tm-lg{width:10px;height:10px;border-radius:3px;display:inline-block}
 .ov-head{display:flex;justify-content:flex-end;margin:0 2px 6px}
 .ov-sum{background:#FAFBFA;border:1px solid #EEF0EF;border-radius:11px;padding:10px 12px;font-size:12.5px;color:#555555;margin-bottom:8px;line-height:1.65}
 .ov-sum .c-rev{color:#0A7A52}.ov-sum .c-lrn{color:#B45309}.ov-sum .c-new{color:#8A8F8B}
@@ -2324,27 +2339,81 @@ function toggleOverview(){
   try{localStorage.setItem('ws-overview',overviewOn?'1':'0');}catch(e){}
   renderTopics();
 }
+function tmWorst(row,rowArea,side){
+  const thick=rowArea/side;
+  let worst=0;
+  row.forEach(it=>{const len=it.area/thick;const ar=len>thick?len/thick:thick/len;if(ar>worst)worst=ar;});
+  return worst;
+}
+function tmLayout(items,x,y,w,h,out){
+  let list=items.slice();
+  while(list.length){
+    if(w<=0.5||h<=0.5){list.forEach(it=>out.push({it,x,y,w:Math.max(w,0),h:Math.max(h,0)}));return;}
+    const side=Math.min(w,h);
+    let row=[list[0]],rowArea=list[0].area,bestWorst=tmWorst(row,rowArea,side);
+    for(let i=1;i<list.length;i++){
+      const cand=row.concat(list[i]);
+      const cw=tmWorst(cand,rowArea+list[i].area,side);
+      if(cw<=bestWorst){row=cand;rowArea+=list[i].area;bestWorst=cw;}
+      else break;
+    }
+    list=list.slice(row.length);
+    const thick=rowArea/side;
+    let off=0;
+    if(w>=h){
+      row.forEach(it=>{const len=it.area/thick;out.push({it,x:x,y:y+off,w:thick,h:len});off+=len;});
+      x+=thick;w-=thick;
+    }else{
+      row.forEach(it=>{const len=it.area/thick;out.push({it,x:x+off,y:y,w:len,h:thick});off+=len;});
+      y+=thick;h-=thick;
+    }
+  }
+}
+const TM_FAM=['#C2C9C4','#9FBBDD','#A6C6B3','#89C4C9'];
+function tmTile(r,gi){
+  const it=r.it,tp=it.tp,s=it.s,on=topicActive(tp);
+  const revP=s.total?Math.round(s.rev/s.total*100):0;
+  const lrnP=s.total?Math.round(s.lrn/s.total*100):0;
+  const x=r.x+1,y=r.y+1,w=Math.max(r.w-2,0),hh=Math.max(r.h-2,0);
+  const bg='linear-gradient(to top,#9CC9B4 0%,#9CC9B4 '+revP+'%,#EBC78A '+revP+'%,#EBC78A '+(revP+lrnP)+'%,#F0F2F1 '+(revP+lrnP)+'%,#F0F2F1 100%)';
+  const rem=remMap[tp];
+  const cls='tm-tile'+(on?'':' off')+(w<74?' sm':'')+(w<44||hh<34?' xs':'');
+  const info=esc(tp)+' — '+s.nw+' '+esc(t('lg.new'))+' · '+s.lrn+' '+esc(t('lg.lrn'))+' · '+s.rev+' '+esc(t('lg.rev'));
+  return '<div class="'+cls+'" style="left:'+x.toFixed(1)+'px;top:'+y.toFixed(1)+'px;width:'+w.toFixed(1)+'px;height:'+hh.toFixed(1)+'px;background:'+bg+';border-color:'+TM_FAM[gi]+'" title="'+info+'" onclick="toggleTopic('+it.i+')">'+
+    '<span class="tm-c">'+s.total+'</span>'+
+    (rem?'<span class="tm-rem">⏰</span>':'')+
+    '<span class="tm-e">'+deckEmoji(tp)+'</span>'+
+    '<span class="tm-n">'+esc(tp)+'</span>'+
+  '</div>';
+}
 function overviewHtml(defs){
   const tot={nw:0,lrn:0,rev:0};
   TOPICS.forEach(tp=>{const s=topicStats(tp);tot.nw+=s.nw;tot.lrn+=s.lrn;tot.rev+=s.rev;});
   let h='<div class="ov-sum">'+t('ov.sum',TOPICS.length,tot.nw+tot.lrn+tot.rev)+'<br><span class="ov-leg"><b class="c-rev">'+tot.rev+'</b> '+esc(t('lg.rev'))+' · <b class="c-lrn">'+tot.lrn+'</b> '+esc(t('lg.lrn'))+' · <b class="c-new">'+tot.nw+'</b> '+esc(t('lg.new'))+'</span></div>';
+  const el=$('topic-chips');
+  const W=(el&&el.clientWidth)||360;
+  const H=Math.min(460,Math.max(360,Math.round(W*1.15)));
+  const fams=[];
   deckGroups.forEach((idxs,gi)=>{
     if(!idxs.length)return;
-    h+='<div class="ov-gh">'+esc(defs[gi][0])+'</div>';
-    idxs.forEach(i=>{
-      const tp=TOPICS[i];
-      const s=topicStats(tp);
-      const on=topicActive(tp);
-      const revPct=s.total?(s.rev/s.total*100):0,lrnPct=s.total?(s.lrn/s.total*100):0;
-      const rem=remMap[tp];
-      h+='<div class="ov-row'+(on?'':' off')+'" onclick="toggleTopic('+i+')" title="'+s.nw+' '+esc(t('lg.new'))+' · '+s.lrn+' '+esc(t('lg.lrn'))+' · '+s.rev+' '+esc(t('lg.rev'))+'">'+
-        '<span class="ov-dot'+(on?' on':'')+'"></span>'+
-        '<span class="ov-name">'+(deckEmoji(tp)?deckEmoji(tp)+' ':'')+esc(tp)+(rem?' <span class="ov-rem">⏰</span>':'')+'</span>'+
-        '<span class="tbar ov-bar"><span class="tb tb-rev" style="width:'+revPct.toFixed(0)+'%"></span><span class="tb tb-lrn" style="width:'+lrnPct.toFixed(0)+'%"></span></span>'+
-        '<span class="ov-n" onclick="openDeck(event,'+i+')">'+s.total+' ›</span>'+
-      '</div>';
-    });
+    const items=idxs.map(i=>{const tp=TOPICS[i];const s=topicStats(tp);return{i,tp,s,area:Math.max(s.total,3)};}).sort((a,b)=>b.area-a.area);
+    fams.push({gi,items,total:items.reduce((s,it)=>s+it.area,0)});
   });
+  const famTotal=fams.reduce((s,f)=>s+f.total,0);
+  const famItems=fams.map(f=>({f,area:f.total/famTotal*W*H})).sort((a,b)=>b.area-a.area);
+  const famRects=[];
+  tmLayout(famItems,0,0,W,H,famRects);
+  let tiles='';
+  famRects.forEach(fr=>{
+    const f=fr.it.f;
+    const tot2=f.items.reduce((s,it)=>s+it.area,0);
+    const scaled=f.items.map(it=>({i:it.i,tp:it.tp,s:it.s,area:it.area/tot2*fr.w*fr.h}));
+    const rects=[];
+    tmLayout(scaled,fr.x,fr.y,fr.w,fr.h,rects);
+    rects.forEach(r=>{tiles+=tmTile(r,f.gi);});
+  });
+  h+='<div class="tm-wrap" style="height:'+H+'px">'+tiles+'</div>';
+  h+='<div class="tm-leg"><span><span class="tm-lg" style="background:#9CC9B4"></span>'+esc(t('lg.rev'))+'</span><span><span class="tm-lg" style="background:#EBC78A"></span>'+esc(t('lg.lrn'))+'</span><span><span class="tm-lg" style="background:#F0F2F1"></span>'+esc(t('lg.new'))+'</span></div>';
   return h;
 }
 function toggleGroup(gi){
@@ -2584,6 +2653,7 @@ function toggleSetup(){
   setupOpen=!setupOpen;
   try{localStorage.setItem('wortschatz-ui-setup',setupOpen?'1':'0');}catch(e){}
   syncSetup();
+  if(setupOpen&&overviewOn)renderTopics();
 }
 function syncSetup(){
   const p=$('setup-panel'),b=$('setup-bar');
