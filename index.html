@@ -2871,6 +2871,7 @@ function startSession(all){
   queue=pool.map(w=>w.id);
   const lim=sessionSize();
   if(lim&&queue.length>lim)queue=queue.slice(0,lim);
+  shuffle(queue);
   practice=false;
   reviewOn=false;
   selOn=false;
@@ -2883,6 +2884,7 @@ function startSession(all){
 }
 function startRound(ids,opts){
   queue=ids.filter(id=>deck.words.some(w=>w.id===id));
+  shuffle(queue);
   practice=!!(opts&&opts.practice);
   reviewOn=!!(opts&&opts.review);
   selOn=!!(opts&&opts.sel);
