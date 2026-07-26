@@ -71,36 +71,23 @@ h1{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
 .rm-bar:hover{border-color:#D9BC6F}
 .rm-bar .rv-go{background:#F7EBCB;color:#92600A}
 #rm-sub{font-size:11.5px;color:#8A8F8B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tm-wrap{position:relative;margin-bottom:6px;overflow:hidden}
-.tm-tile{position:absolute;border:1.5px solid;border-radius:7px;overflow:hidden;cursor:pointer;box-sizing:border-box;padding:13px 5px 4px;transition:opacity .15s;user-select:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start}
-.tm-tile:hover{filter:brightness(.97)}
-.tm-tile.off{border-style:dashed}
-.tm-e{font-size:14px;line-height:1;margin-bottom:2px;flex:none}
-.tm-n{font-size:9px;font-weight:600;color:#3E453F;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%}
 .setup-panel.ov-mode .topic-legend{display:none}
-.tm-c{position:absolute;top:2px;right:5px;font-size:9px;font-weight:600;color:rgba(0,0,0,.38)}
-.tm-rem{position:absolute;top:2px;left:4px;font-size:9px}
-.tm-tile.sm .tm-n{display:none}
-.tm-tile.xs{padding:2px 3px}
-.tm-tile.xs .tm-e{font-size:11px}
-.tm-tile.xs .tm-c{display:none}
-.tm-leg{display:flex;gap:14px;justify-content:center;font-size:10.5px;color:#8A8F8B;margin-bottom:8px}
-.tm-leg span{display:flex;align-items:center;gap:4px}
-.tm-lg{width:10px;height:10px;border-radius:3px;display:inline-block}
+.og-h{display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#A5AAA6;margin:12px 2px 6px}
+.og-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:5px}
+.og-chip{position:relative;display:flex;align-items:center;gap:5px;height:37px;padding:0 8px;border:1px solid #E4E7E5;border-radius:10px;background:#fff;font:inherit;font-size:11.5px;font-weight:600;color:#6B7069;cursor:pointer;overflow:hidden;text-align:left;transition:background .12s,border-color .12s}
+.og-chip:hover{border-color:#C9CFCB}
+.og-chip.on{background:#E9F5EF;border-color:#9CC9B4;color:#143D2C}
+.og-e{font-size:13px;flex:none}
+.og-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.og-n{flex:none;font-size:9.5px;color:#A5AAA6}
+.og-chip.on .og-n{color:#0A7A52}
+.og-rem{flex:none;font-size:10px}
+.og-bar{position:absolute;left:0;right:0;bottom:0;height:3px;display:flex}
+.og-bar i{display:block;height:100%;background:#9CC9B4}
+.og-bar i.lrn{background:#EBC78A}
 .ov-head{display:flex;justify-content:flex-end;margin:0 2px 6px}
 .ov-sum{background:#FAFBFA;border:1px solid #EEF0EF;border-radius:11px;padding:10px 12px;font-size:12.5px;color:#555555;margin-bottom:8px;line-height:1.65}
 .ov-sum .c-rev{color:#0A7A52}.ov-sum .c-lrn{color:#B45309}.ov-sum .c-new{color:#8A8F8B}
-.ov-gh{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#A5AAA6;margin:10px 2px 3px}
-.ov-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:9px;cursor:pointer;font-size:13px;user-select:none}
-.ov-row:hover{background:#F4F6F5}
-.ov-row.off{opacity:.5}
-.ov-dot{width:8px;height:8px;border-radius:99px;background:#D7DBD8;flex:none}
-.ov-dot.on{background:#0A7A52}
-.ov-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
-.ov-bar{width:52px;flex:none}
-.ov-n{flex:none;font-size:11.5px;color:#8A8F8B;font-weight:600;padding:2px 4px;white-space:nowrap}
-.ov-n:hover{color:#0A7A52}
-.ov-rem{font-size:11px}
 .dcard.gram:not(.remind){background:#FAF9FF}
 .dcard.gram:not(.on):not(.remind){border-color:#DCD3F2}
 .dcard.lit:not(.remind){background:#FFFAFB}
@@ -381,6 +368,7 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
   .study-main{max-width:840px;width:100%;margin:0}
   .card{height:clamp(380px,calc(100vh - 470px),600px)}
   #view-list{max-width:760px}
+  .og-grid{grid-template-columns:repeat(auto-fill,minmax(126px,1fr))}
   .study-side{display:flex;flex-direction:column}
   .study-side .gami{order:1}
   #rm-bar{order:2}
@@ -389,8 +377,6 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
   #sv-bar{order:5}
   #setup-bar{order:6}
   #setup-panel{order:7}
-  .tm-n{font-size:10px}
-  .tm-e{font-size:16px}
 }
 </style>
 </head>
@@ -2360,88 +2346,32 @@ function toggleOverview(){
   try{localStorage.setItem('ws-overview',overviewOn?'1':'0');}catch(e){}
   renderTopics();
 }
-let tmRz=null;
-window.addEventListener('resize',()=>{
-  if(!overviewOn)return;
-  clearTimeout(tmRz);
-  tmRz=setTimeout(()=>{renderTopics();},200);
-});
-function tmWorst(row,rowArea,side){
-  const thick=rowArea/side;
-  let worst=0;
-  row.forEach(it=>{const len=it.area/thick;const ar=len>thick?len/thick:thick/len;if(ar>worst)worst=ar;});
-  return worst;
-}
-function tmLayout(items,x,y,w,h,out){
-  let list=items.slice();
-  while(list.length){
-    if(w<=0.5||h<=0.5){list.forEach(it=>out.push({it,x,y,w:Math.max(w,0),h:Math.max(h,0)}));return;}
-    const side=Math.min(w,h);
-    let row=[list[0]],rowArea=list[0].area,bestWorst=tmWorst(row,rowArea,side);
-    for(let i=1;i<list.length;i++){
-      const cand=row.concat(list[i]);
-      const cw=tmWorst(cand,rowArea+list[i].area,side);
-      if(cw<=bestWorst){row=cand;rowArea+=list[i].area;bestWorst=cw;}
-      else break;
-    }
-    list=list.slice(row.length);
-    const thick=rowArea/side;
-    let off=0;
-    if(w>=h){
-      row.forEach(it=>{const len=it.area/thick;out.push({it,x:x,y:y+off,w:thick,h:len});off+=len;});
-      x+=thick;w-=thick;
-    }else{
-      row.forEach(it=>{const len=it.area/thick;out.push({it,x:x+off,y:y,w:len,h:thick});off+=len;});
-      y+=thick;h-=thick;
-    }
-  }
-}
-const TM_FAM=['#C2C9C4','#9FBBDD','#A6C6B3','#89C4C9'];
-function tmTile(r,gi){
-  const it=r.it,tp=it.tp,s=it.s,on=topicActive(tp);
-  const revP=s.total?Math.round(s.rev/s.total*100):0;
-  const lrnP=s.total?Math.round(s.lrn/s.total*100):0;
-  const x=r.x+1,y=r.y+1,w=Math.max(r.w-2,0),hh=Math.max(r.h-2,0);
-  const bg='linear-gradient(to top,#9CC9B4 0%,#9CC9B4 '+revP+'%,#EBC78A '+revP+'%,#EBC78A '+(revP+lrnP)+'%,#F0F2F1 '+(revP+lrnP)+'%,#F0F2F1 100%)';
-  const rem=remMap[tp];
-  const cls='tm-tile'+(on?'':' off')+(w<64?' sm':'')+(w<44||hh<34?' xs':'');
-  const info=esc(tp)+' — '+s.nw+' '+esc(t('lg.new'))+' · '+s.lrn+' '+esc(t('lg.lrn'))+' · '+s.rev+' '+esc(t('lg.rev'));
-  return '<div class="'+cls+'" style="left:'+x.toFixed(1)+'px;top:'+y.toFixed(1)+'px;width:'+w.toFixed(1)+'px;height:'+hh.toFixed(1)+'px;background:'+bg+';border-color:'+TM_FAM[gi]+'" title="'+info+'" onclick="toggleTopic('+it.i+')">'+
-    '<span class="tm-c">'+s.total+'</span>'+
-    (rem?'<span class="tm-rem">⏰</span>':'')+
-    '<span class="tm-e">'+deckEmoji(tp)+'</span>'+
-    '<span class="tm-n">'+esc(tp)+'</span>'+
-  '</div>';
-}
 function overviewHtml(defs){
   const tot={nw:0,lrn:0,rev:0};
   TOPICS.forEach(tp=>{const s=topicStats(tp);tot.nw+=s.nw;tot.lrn+=s.lrn;tot.rev+=s.rev;});
   let h='<div class="ov-sum">'+t('ov.sum',TOPICS.length,tot.nw+tot.lrn+tot.rev)+'<br><span class="ov-leg"><b class="c-rev">'+tot.rev+'</b> '+esc(t('lg.rev'))+' · <b class="c-lrn">'+tot.lrn+'</b> '+esc(t('lg.lrn'))+' · <b class="c-new">'+tot.nw+'</b> '+esc(t('lg.new'))+'</span></div>';
-  const el=$('topic-chips');
-  const W=(el&&el.clientWidth)||360;
-  const big=window.innerWidth>=1280;
-  const H=Math.min(big?640:460,Math.max(360,Math.round(W*(big?1.35:1.15))));
-  const fams=[];
   deckGroups.forEach((idxs,gi)=>{
     if(!idxs.length)return;
-    const items=idxs.map(i=>{const tp=TOPICS[i];const s=topicStats(tp);return{i,tp,s,area:Math.max(s.total,3)};}).sort((a,b)=>b.area-a.area);
-    fams.push({gi,items,total:items.reduce((s,it)=>s+it.area,0)});
+    const allOn=idxs.every(i=>topicActive(TOPICS[i]));
+    h+='<div class="og-h"><span>'+esc(defs[gi][0])+'</span>'+
+      (idxs.length>1?'<button class="dg-toggle" onclick="groupToggle('+gi+')">'+esc(allOn?t('ui.alloff'):t('ui.allon'))+'</button>':'')+
+      '</div><div class="og-grid">';
+    idxs.forEach(i=>{
+      const tp=TOPICS[i];
+      const s=topicStats(tp);
+      const on=topicActive(tp);
+      const revP=s.total?(s.rev/s.total*100):0,lrnP=s.total?(s.lrn/s.total*100):0;
+      const rem=remMap[tp];
+      h+='<button class="og-chip'+(on?' on':'')+'" onclick="toggleTopic('+i+')" title="'+esc(tp)+' — '+s.nw+' '+esc(t('lg.new'))+' · '+s.lrn+' '+esc(t('lg.lrn'))+' · '+s.rev+' '+esc(t('lg.rev'))+'">'+
+        (deckEmoji(tp)?'<span class="og-e">'+deckEmoji(tp)+'</span>':'')+
+        '<span class="og-t">'+esc(tp)+'</span>'+
+        (rem?'<span class="og-rem">⏰</span>':'')+
+        '<span class="og-n">'+s.total+'</span>'+
+        '<span class="og-bar"><i style="width:'+revP.toFixed(0)+'%"></i><i class="lrn" style="width:'+lrnP.toFixed(0)+'%"></i></span>'+
+      '</button>';
+    });
+    h+='</div>';
   });
-  const famTotal=fams.reduce((s,f)=>s+f.total,0);
-  const famItems=fams.map(f=>({f,area:f.total/famTotal*W*H})).sort((a,b)=>b.area-a.area);
-  const famRects=[];
-  tmLayout(famItems,0,0,W,H,famRects);
-  let tiles='';
-  famRects.forEach(fr=>{
-    const f=fr.it.f;
-    const tot2=f.items.reduce((s,it)=>s+it.area,0);
-    const scaled=f.items.map(it=>({i:it.i,tp:it.tp,s:it.s,area:it.area/tot2*fr.w*fr.h}));
-    const rects=[];
-    tmLayout(scaled,fr.x,fr.y,fr.w,fr.h,rects);
-    rects.forEach(r=>{tiles+=tmTile(r,f.gi);});
-  });
-  h+='<div class="tm-wrap" style="height:'+H+'px">'+tiles+'</div>';
-  h+='<div class="tm-leg"><span><span class="tm-lg" style="background:#9CC9B4"></span>'+esc(t('lg.rev'))+'</span><span><span class="tm-lg" style="background:#EBC78A"></span>'+esc(t('lg.lrn'))+'</span><span><span class="tm-lg" style="background:#F0F2F1"></span>'+esc(t('lg.new'))+'</span></div>';
   return h;
 }
 function toggleGroup(gi){
