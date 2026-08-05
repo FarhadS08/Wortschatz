@@ -380,9 +380,6 @@ label{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-t
   #view-study{display:grid;grid-template-columns:390px minmax(0,1fr);gap:0 28px;align-items:start}
   .study-side{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;scrollbar-width:thin;padding-right:3px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
   .study-main{min-width:0}
-  .setup-bar{pointer-events:none;border-radius:15px 15px 0 0;margin-bottom:0;border-bottom-color:#F0F2F1}
-  .setup-bar .sb-chev{display:none}
-  .setup-panel.hidden{display:block!important}
   .card{height:400px}
   #view-list,#view-add{max-width:680px;margin:0 auto}
   #view-account{max-width:620px;margin:0 auto}
@@ -568,7 +565,7 @@ let exerOn=false,curExer=null;
 let sessionSeen=new Set(),roundInfo=null;
 let selectMode=false,selIds=new Set();
 let setupOpen=false;
-try{setupOpen=localStorage.getItem('wortschatz-ui-setup')==='1';}catch(e){}
+try{const svS=localStorage.getItem('wortschatz-ui-setup');setupOpen=svS===null?window.innerWidth>=1000:svS==='1';}catch(e){}
 let listTopic='',listState='',expandedId=null,lastLT='';
 let editingId=null,armedDelete=null,armTimer=null,selArt='',currentView='study';
 let artTouched=false,saving=false;
