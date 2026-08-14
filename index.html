@@ -1856,6 +1856,20 @@ function koerperPack(){
   ];
 }
 
+function koerper2Pack(){
+  const now=Date.now();
+  const mk=(art,de,en,ex,ext,note,i)=>({id:'kp'+i,art,de,en,ex,ext,note,topic:'Körperteile',box:1,due:0,created:now});
+  return[
+    mk('die','Zunge','tongue','Der Arzt sagt: Zeig mir bitte die Zunge!','The doctor says: please show me your tongue!','Plural: die Zungen',22),
+    mk('die','Brust','chest, breast','Beim Husten tut mir die Brust weh.','My chest hurts when I cough.','Plural: die Brüste',23),
+    mk('der','Ellenbogen','elbow','Ich habe mir den Ellenbogen am Tisch gestoßen.','I banged my elbow on the table.','Plural: die Ellenbogen',24),
+    mk('das','Handgelenk','wrist','Beim Tippen tut mir das Handgelenk weh.','My wrist hurts when I type.','Plural: die Handgelenke · Gelenk = joint',25),
+    mk('der','Po','bottom, butt','Das Baby fällt auf den Po.','The baby falls on its bottom.','umgangssprachlich · Plural: die Pos',26),
+    mk('das','Fußgelenk','ankle','Ich habe mir beim Joggen das Fußgelenk verstaucht.','I sprained my ankle while jogging.','Plural: die Fußgelenke · auch: der Knöchel',27),
+    mk('die','Zehe','toe','Ich habe mir die Zehe am Bett gestoßen.','I stubbed my toe on the bed.','Plural: die Zehen · auch: der Zeh',28)
+  ];
+}
+
 function laenderPack(){
   const now=Date.now();
   const mk=(t,art,de,en,ex,ext,note,i)=>({id:'ct'+i,art,de,en,ex,ext,note,topic:t,box:1,due:0,created:now});
@@ -2207,6 +2221,7 @@ function migrate(){
   }
   if(deck.packs.indexOf('partizip')<0){deck.words=deck.words.concat(partizipPack());deck.packs.push('partizip');changed=true;}
   if(deck.packs.indexOf('akkdat')<0){deck.words=deck.words.concat(akkDatPack());deck.packs.push('akkdat');changed=true;}
+  if(deck.packs.indexOf('koerper2')<0){deck.words=deck.words.concat(koerper2Pack());deck.packs.push('koerper2');changed=true;}
   deck.words.forEach(w=>{if(w.ease==null){nrm(w);changed=true;}});
   if(!deck.seenFilled){
     deck.words.forEach(w=>{
