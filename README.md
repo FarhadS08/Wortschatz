@@ -15,9 +15,13 @@ A German flashcard app: single page, no build step, installable on your phone, w
 
 ## Accounts & sync
 
-The app has built-in accounts ("Konto & Sync" via the cloud button in the header): register once, log in on each device, and your words plus the full learning progress sync automatically — the deck is pulled when the app opens and pushed ~1.5 s after every change; the newest state wins.
+The app has built-in accounts ("Konto & Sync" via the cloud button in the header): register once, log in on each device, and your words plus the full learning progress sync automatically. The deck is pulled when the app opens and whenever you come back to it, and pushed a few seconds after you stop answering (one upload per pause, not one per card).
+
+Studying on two devices never loses progress: every saved deck has a revision number, and when another device saved in between, the server refuses the stale upload and the app merges both versions card by card — the schedule from the latest real grading, practice stats from the latest change, the text from the latest edit, and deletions win over older edits. Two open tabs merge the same way. Failed uploads retry with backoff, and logging out first uploads anything unsaved.
 
 You stay logged in via a secure (`HttpOnly`) session cookie that renews itself for 90 days on every visit — even if the browser clears local storage, the app logs itself back in and restores the deck from the server.
+
+Both server endpoints only accept JSON from the app's own origin. Logins are rate-limited per IP and per account. The AI endpoint only runs the app's three fixed tasks (article, auto-fill, translation), with the prompts, model and limits set on the server, so the API key can't be used as a general-purpose proxy.
 
 ## Features
 
@@ -73,6 +77,7 @@ Each card's note keeps the extra context from the book:
 ```
 index.html            the whole app (UI, styles, data packs, logic)
 api/ai.js             Vercel serverless proxy for the AI features
+api/sync.js           Vercel serverless accounts + deck sync (Upstash Redis)
 manifest.webmanifest  PWA manifest
 sw.js                 service worker (offline cache)
 icons/                favicon + home-screen icons

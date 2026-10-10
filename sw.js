@@ -1,4 +1,4 @@
-const CACHE='wortschatz-v1';
+const CACHE='wortschatz-v2';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icons/favicon.svg','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install',e=>{
@@ -14,16 +14,20 @@ self.addEventListener('activate',e=>{
 });
 
 // Same-origin GET: network first (updates arrive immediately), cache fallback (offline).
+// Only complete, successful responses are cached, so an error page or a
+// half-deployed file never replaces the working offline copy.
 // Everything else (fonts CDN, AI requests) goes straight to the network.
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const url=new URL(e.request.url);
-  if(url.origin!==location.origin)return;
+  if(url.origin!==location.origin||url.pathname.indexOf('/api/')===0)return;
   e.respondWith(
     fetch(e.request).then(res=>{
-      const copy=res.clone();
-      caches.open(CACHE).then(c=>c.put(e.request,copy));
+      if(res.ok&&res.type==='basic'){
+        const copy=res.clone();
+        caches.open(CACHE).then(c=>c.put(e.request,copy));
+      }
       return res;
-    }).catch(()=>caches.match(e.request).then(m=>m||caches.match('./index.html')))
+    }).catch(()=>caches.match(e.request).then(m=>m||(e.request.mode==='navigate'?caches.match('./index.html'):Response.error())))
   );
 });
