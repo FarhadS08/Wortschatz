@@ -4754,14 +4754,16 @@ function guessArticle(w){
   return null;
 }
 const AI_MODEL='claude-sonnet-5';
-// AI runs on the user's own Claude key, sent from this browser straight to Anthropic
+// AI runs on the user's own Claude key, sent from this browser straight to Anthropic.
+// Thinking is switched off: these are short lookups, and Claude Sonnet 5 would otherwise think first,
+// which counts against max_tokens. (Claude Sonnet 5.5 would need {type:'between_tools'} here instead.)
 async function aiCall(task,params,prompt,maxTokens){
   const key=aiKey();
   if(!key){const e=new Error('nokey');e.code='nokey';throw e;}
   let res;
   try{
     res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:AI_MODEL,max_tokens:maxTokens,messages:[{role:'user',content:prompt}]})});
+      body:JSON.stringify({model:AI_MODEL,max_tokens:maxTokens,thinking:{type:'disabled'},messages:[{role:'user',content:prompt}]})});
   }catch(e){const er=new Error('network');er.status=0;throw er;}
   if(!res.ok){
     let msg='';
@@ -5658,7 +5660,7 @@ function aiErrMsg(e){
   if(e.status===429)return t('e.rate');
   if(e.status===529||e.status===503)return t('ai.busy');
   if(e.status===400&&/credit/i.test(e.msg||''))return t('ai.credit');
-  return t('ai.fail',e.status);
+  return t('ai.fail',e.status)+(e.msg?': '+String(e.msg).slice(0,160):'');
 }
 function renderAiBox(){
   const el=$('ai-box');
@@ -5687,7 +5689,7 @@ function aiRemoveKey(){
 }
 async function aiTestKey(){
   const b=$('ai-test');if(b)b.disabled=true;
-  try{await aiCall('test',{},'Antworte nur mit: ok',16);toast(t('ai.ok'));}
+  try{await aiCall('test',{},'Antworte nur mit: ok',64);toast(t('ai.ok'));}
   catch(e){toast(aiErrMsg(e));}
   if(b)b.disabled=false;
 }
