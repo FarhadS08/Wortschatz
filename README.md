@@ -1,6 +1,9 @@
 # Wortschatz
 
-German vocabulary, word by word: a flashcard app with spaced repetition, exercises and 40 ready-made decks. Single page, no build step, installable on your phone, works offline. Accounts are optional.
+German vocabulary, word by word: a flashcard app with spaced repetition, exercises and 40 ready-made decks. Plain HTML, no build step, installable on your phone, works offline. Accounts are optional.
+
+- `/` is the landing page: what the app is, how it differs from big all-subject flashcard apps, a flashcard and a der/die/das quiz to try, in 17 languages (picked from the browser, or with `?lang=tr` etc.). People who have used the app before go straight on to it; `/?home` shows the landing page anyway.
+- `/app` is the app itself (`app.html`, served at `/app` by `vercel.json`). Installed home-screen apps open there.
 
 ## Use it everywhere
 
@@ -92,7 +95,10 @@ Each card's note keeps the extra context from the book:
 ## Project structure
 
 ```
-index.html            the whole app (UI, styles, data packs, logic)
+index.html            landing page (17 languages, no dependencies)
+app.html              the whole app (UI, styles, data packs, logic), served at /app
+vercel.json           serves app.html at /app
+og.png                link preview image (X, WhatsApp, …)
 config.js             public Supabase settings (project URL + publishable key)
 lib/supabase.js       supabase-js 2.117.3, vendored (MIT)
 supabase/migrations/  database schema: tables, row-level security, merge function

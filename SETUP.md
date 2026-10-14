@@ -45,6 +45,7 @@ anywhere in the app or in chat.
 
 ## 4. Sign-in addresses
 
+The landing page lives at `/`, the app at `/app`. Sign-in has to come back to the app.
 In Supabase, open **Authentication** → **URL Configuration**:
 
 - **Site URL:** your app's address, for example `https://your-domain.com/app`
@@ -102,12 +103,18 @@ email templates under **Authentication** → **Emails** → **Templates** —
 
 ## 8. Try it
 
-1. Open the app, tap the cloud button (top right) and sign in with Google.
+1. Open `https://your-domain.com/app`, tap the cloud button (top right) and sign in with Google.
 2. Study a few cards, then open the app on your phone and sign in there too: your
    progress, your own words and your settings are there.
 3. Under **KI-Funktionen** paste your Claude key (from
    [console.anthropic.com](https://console.anthropic.com/settings/keys)) and tap
    **Testen**. The key stays in that browser only.
+
+## 9. Link previews (X, WhatsApp, …)
+
+When someone posts your address, X shows the picture `og.png`. X needs its full address:
+in `index.html`, replace `og.png` in the two lines `og:image` and `twitter:image` with
+`https://your-domain.com/og.png`. Check the result with any "open graph preview" site.
 
 ## For developers
 
