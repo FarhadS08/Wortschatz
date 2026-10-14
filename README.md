@@ -28,7 +28,7 @@ The account (cloud chip) and the app language (globe) sit in the top-right corne
 
 ## Accounts & sync
 
-Accounts are optional: without one, everything stays in the browser. The cloud button (top right) signs you in with **Google** or an **email link** — the email also carries a 6-digit code, for when it arrives on another device. Your words, your learning progress and your settings then follow you to every device.
+Accounts are optional: without one, everything stays in the browser. The cloud button (top right) signs you in with **Google** or an **email link** — the email also carries a 6-digit code, for when it arrives on another device. Email sign-in needs a mail service with your own domain, so it stays hidden until `emailSignIn: true` is set in `config.js`. Your words, your learning progress and your settings then follow you to every device.
 
 - **Local first**: the browser keeps its own working copy, so the app stays fast and works offline. A change marks the word for upload; a few seconds after you stop answering, the changed words go up in one request. When the app opens, and whenever you come back to it, it pulls what other devices changed since its last pull.
 - **Only what's yours is stored**: your own words, plus built-in words you have studied or edited. Built-in words you never touched aren't stored at all; the 40 decks ship with the app.

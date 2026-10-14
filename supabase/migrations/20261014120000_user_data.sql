@@ -83,8 +83,11 @@ create policy "Users delete their own cards"
   using (user_id = (select auth.uid()));
 
 -- Writes only go through push_cards(), which merges instead of overwriting.
+-- Rights are spelled out, so this works whatever the project's default privileges are.
 revoke all on public.cards from anon;
 revoke insert, update on public.cards from authenticated;
+grant usage on schema public to authenticated;
+grant select, delete on public.cards to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- push_cards: save a batch of cards, merging each with what is already stored
@@ -191,3 +194,4 @@ create policy "Users manage their own state"
   with check (user_id = (select auth.uid()));
 
 revoke all on public.user_state from anon;
+grant select, insert, update, delete on public.user_state to authenticated;

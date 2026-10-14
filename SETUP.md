@@ -1,10 +1,15 @@
 # Setting up accounts (Supabase)
 
 The app works without any of this: everything then stays in each visitor's browser.
-These steps switch on accounts, so people can sign in with Google or an email link,
-keep their words in their account and use several devices.
+These steps switch on accounts, so people can sign in with Google (and, once you have
+a mail service, with an email link), keep their words in their account and use several
+devices.
 
 You need about 30 minutes. Nothing here costs money on the free plans.
+
+Below, `your-domain.com` means your site's address: your own domain, or the address
+Vercel gave you (for example `flashcard-xyz.vercel.app`). The landing page lives at `/`,
+the app at `/app`.
 
 ## 1. Create the Supabase project
 
@@ -26,37 +31,60 @@ without any visits; once people use the app every day, that doesn't happen.
 This creates two tables (`cards`, `user_state`) with row-level security: every account
 can only read and change its own rows.
 
-## 3. Connect the app
+## 3. Google sign-in
 
-1. In Supabase, open **Project Settings** → **API Keys** (or **API**).
-2. Copy the **Project URL** and the **Publishable key** (older projects: the **anon public** key).
+1. In Supabase, open **Authentication** → **Sign In / Providers** (older dashboards:
+   **Providers**) → **Google**, and copy the **Callback URL** shown there. It looks like
+   `https://abcdefgh.supabase.co/auth/v1/callback`. Keep this tab open.
+2. In a new tab, open [Google Cloud Console](https://console.cloud.google.com) and create
+   a project (e.g. `wortschatz`).
+3. Open **Google Auth Platform** (in older menus: **APIs & Services** → **OAuth consent
+   screen**) → **Get started**: app name *Wortschatz*, your email as support email,
+   audience **External**, your email as contact. Agree and create.
+4. **Clients** → **Create client** → application type **Web application**:
+   - **Authorized JavaScript origins:** `https://your-domain.com`
+   - **Authorized redirect URIs:** the Callback URL from step 1
+   - Click **Create** and copy the **Client ID** and the **Client secret**.
+5. **Audience** → **Publish app** → confirm. Until you do this, only the test users
+   listed there can sign in.
+6. Back in Supabase (Google provider page): switch **Enable Sign in with Google** on,
+   paste the Client ID and the Client secret, and **Save**.
+
+## 4. Sign-in addresses
+
+In Supabase, open **Authentication** → **URL Configuration**:
+
+- **Site URL:** `https://your-domain.com/app`
+- **Redirect URLs:** add `https://your-domain.com/**`
+  (also add your Vercel address, e.g. `https://flashcard-xyz.vercel.app/**`, if you use
+  your own domain but want to test on the Vercel one)
+
+## 5. Switch it on
+
+1. In Supabase, click **Connect** at the top of the project (or open **Project Settings**:
+   the URL is under **Data API**, the key under **API Keys**).
+2. Copy the **Project URL** and the **Publishable key** (`sb_publishable_…`; older
+   projects call it the **anon public** key).
 3. In GitHub, open [`config.js`](config.js), click the pencil to edit, paste both values
    between the quotes, and commit:
 
    ```js
    window.WS_CONFIG = {
      supabaseUrl: 'https://abcdefgh.supabase.co',
-     supabaseAnonKey: 'sb_publishable_…'
+     supabaseAnonKey: 'sb_publishable_…',
+     emailSignIn: false
    };
    ```
 
-Both values are meant to be public. **Never** put the *secret* / *service_role* key
-anywhere in the app or in chat.
+Vercel deploys the change within a minute; from then on the cloud button offers Google
+sign-in. Both values are meant to be public. **Never** put the *secret* /
+*service_role* key anywhere in the app or in chat.
 
-## 4. Sign-in addresses
+## 6. Email sign-in (link + code) — needs your own domain
 
-The landing page lives at `/`, the app at `/app`. Sign-in has to come back to the app.
-In Supabase, open **Authentication** → **URL Configuration**:
-
-- **Site URL:** your app's address, for example `https://your-domain.com/app`
-- **Redirect URLs:** add `https://your-domain.com/**`
-  (and, while testing, your Vercel address, e.g. `https://flashcard-xyz.vercel.app/**`)
-
-## 5. Email sign-in (link + code)
-
-Supabase's built-in mailer only sends about 2 emails per hour and only to your own
-team, so for real users you need a mail service. [Resend](https://resend.com) has a
-free tier:
+Supabase's built-in mailer only sends to your own team and about 2 emails per hour, so
+real users need a mail service. Skip this step if you don't have a domain yet: the app
+then offers Google sign-in only. [Resend](https://resend.com) has a free tier:
 
 1. Sign up at Resend, **Domains** → **Add domain**, and add the DNS records it shows
    at your domain registrar. Wait until the domain is *verified*.
@@ -66,32 +94,19 @@ free tier:
    - Sender email: e.g. `login@your-domain.com`, sender name: `Wortschatz`
 4. Supabase → **Authentication** → **Rate Limits**: raise *emails per hour* if you
    expect many sign-ups (the default with custom SMTP is 30).
+5. The app lets people either tap the link in the email **or** type the code from it
+   (handy when the email arrives on another device). For the code to appear, edit both
+   email templates under **Authentication** → **Emails** → **Templates** —
+   *Magic Link* and *Confirm signup* — and use this body:
 
-The app lets people either tap the link in the email **or** type the code from it
-(handy when the email arrives on another device). For the code to appear, edit both
-email templates under **Authentication** → **Emails** → **Templates** —
-*Magic Link* and *Confirm signup* — and use this body:
+   ```html
+   <h2>Your Wortschatz sign-in</h2>
+   <p><a href="{{ .ConfirmationURL }}">Sign in to Wortschatz</a></p>
+   <p>Or enter this code in the app: <strong>{{ .Token }}</strong></p>
+   <p>If you didn't ask for this, you can ignore this email.</p>
+   ```
 
-```html
-<h2>Your Wortschatz sign-in</h2>
-<p><a href="{{ .ConfirmationURL }}">Sign in to Wortschatz</a></p>
-<p>Or enter this code in the app: <strong>{{ .Token }}</strong></p>
-<p>If you didn't ask for this, you can ignore this email.</p>
-```
-
-## 6. Google sign-in
-
-1. Open [Google Cloud Console](https://console.cloud.google.com), create a project
-   (e.g. `wortschatz`).
-2. **APIs & Services** → **OAuth consent screen**: user type *External*, app name
-   *Wortschatz*, your support email, your app's address as homepage. Add the scopes
-   `email`, `profile`, `openid` (the defaults). Publish the app when you go live.
-3. **APIs & Services** → **Credentials** → **Create credentials** → **OAuth client ID**
-   → *Web application*. Under **Authorized redirect URIs** add:
-   `https://<your-project-ref>.supabase.co/auth/v1/callback`
-   (Supabase shows this exact address on its Google provider page).
-4. Copy the **Client ID** and **Client secret**.
-5. Supabase → **Authentication** → **Providers** → **Google** → enable, paste both, save.
+6. In `config.js`, change `emailSignIn: false` to `emailSignIn: true` and commit.
 
 ## 7. Clean up on Vercel
 

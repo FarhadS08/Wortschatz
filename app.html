@@ -5305,6 +5305,8 @@ addEventListener('storage',e=>{
 // Built-in words ship with the app, so the server only stores what a user changed.
 const CFG=window.WS_CONFIG||{};
 const SB_ON=!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
+// email sign-in needs a mail service (SETUP.md step 5); until it is switched on, only Google is offered
+const SB_EMAIL=CFG.emailSignIn===true;
 let sbTimer=null,sbBusy=false,sbPending=false,sbFails=0,sbLastPull=0,sbMail='',sbErr='',sbReady=false;
 let builtinMap=null;
 // the built-in words exactly as a fresh device has them (packs + migrations)
@@ -5636,8 +5638,8 @@ function sbAccountHtml(){
   }
   return '<div class="acct-status">'+esc(t('sb.intro'))+'</div>'+
     '<button class="acct-google" onclick="sbGoogle()">'+G_LOGO+'<span>'+esc(t('sb.google'))+'</span></button>'+
-    '<div class="acct-or">'+esc(t('sb.or'))+'</div>'+
-    '<div class="acct-row"><input id="sb-email" class="input" type="email" autocomplete="email" placeholder="'+esc(t('sb.email'))+'" aria-label="'+esc(t('sb.email'))+'" onkeydown="sbKeyMail(event)"><button class="btn knew" id="sb-send" onclick="sbSendLink()">'+esc(t('sb.send'))+'</button></div>'+
+    (SB_EMAIL?'<div class="acct-or">'+esc(t('sb.or'))+'</div>'+
+    '<div class="acct-row"><input id="sb-email" class="input" type="email" autocomplete="email" placeholder="'+esc(t('sb.email'))+'" aria-label="'+esc(t('sb.email'))+'" onkeydown="sbKeyMail(event)"><button class="btn knew" id="sb-send" onclick="sbSendLink()">'+esc(t('sb.send'))+'</button></div>':'')+
     '<div class="hint">'+esc(t('sb.privacy'))+'</div>';
 }
 async function sbSyncNow(){
