@@ -1,5 +1,5 @@
-const CACHE='wortschatz-v2';
-const ASSETS=['./','./index.html','./manifest.webmanifest','./icons/favicon.svg','./icons/icon-192.png','./icons/icon-512.png'];
+const CACHE='wortschatz-v3';
+const ASSETS=['./','./index.html','./config.js','./lib/supabase.js','./manifest.webmanifest','./icons/favicon.svg','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));
