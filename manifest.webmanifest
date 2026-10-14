@@ -1,16 +1,30 @@
 {
-  "name": "Wortschatz — Moin, Deutsch!",
+  "name": "Wortschatz",
   "short_name": "Wortschatz",
-  "description": "Deutsche Vokabeln & Floskeln lernen — einfache Karteikarten mit Wiederholungssystem.",
+  "description": "German vocabulary, word by word: calm flashcards with spaced repetition, exercises and 40 ready-made decks.",
   "lang": "de",
-  "start_url": "./",
+  "id": "/",
+  "start_url": "app",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#F4F6F5",
-  "theme_color": "#F4F6F5",
+  "background_color": "#F4F2ED",
+  "theme_color": "#F4F2ED",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

@@ -1,5 +1,6 @@
-const CACHE='wortschatz-v2';
-const ASSETS=['./','./index.html','./manifest.webmanifest','./icons/favicon.svg','./icons/icon-192.png','./icons/icon-512.png'];
+const CACHE='wortschatz-v4';
+// index.html is the landing page, app.html the app (served at /app, see vercel.json)
+const ASSETS=['./','./index.html','./app.html','./config.js','./lib/supabase.js','./manifest.webmanifest','./icons/favicon.svg','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));
@@ -17,6 +18,7 @@ self.addEventListener('activate',e=>{
 // Only complete, successful responses are cached, so an error page or a
 // half-deployed file never replaces the working offline copy.
 // Everything else (fonts CDN, AI requests) goes straight to the network.
+function isApp(url){return /\/app(\.html)?$/.test(url.pathname);}
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const url=new URL(e.request.url);
@@ -28,6 +30,6 @@ self.addEventListener('fetch',e=>{
         caches.open(CACHE).then(c=>c.put(e.request,copy));
       }
       return res;
-    }).catch(()=>caches.match(e.request).then(m=>m||(e.request.mode==='navigate'?caches.match('./index.html'):Response.error())))
+    }).catch(()=>caches.match(e.request).then(m=>m||(e.request.mode==='navigate'?caches.match(isApp(url)?'./app.html':'./index.html'):Response.error())))
   );
 });
